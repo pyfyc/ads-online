@@ -2,26 +2,29 @@ package com.skypro.adsonline.service;
 
 import com.skypro.adsonline.dto.Ads;
 import com.skypro.adsonline.dto.Comment;
+import com.skypro.adsonline.dto.CreateAds;
 
 public interface AdService {
 
-    boolean addAds(Ads ads);
+    boolean addAds(Object properties, byte[] image);
 
-    boolean getComments(long id);
+    boolean getComments(String adPk);
 
-    boolean getComments(Comment comment);
+    boolean getComments(String adPk, Integer id);
 
-    boolean addComments(Comment comment);
+    boolean addComments(String adPk, Comment comment);
 
-    boolean getFullAd(long id);
+    boolean addComments(long id, String adPk);
 
-    boolean removeAds(long id);
+    boolean getFullAd(Integer id);
 
-    boolean updateAds(long id, Ads ads);
+    boolean removeAds(Integer id);
 
-    boolean deleteComments(long id);
+    boolean updateAds(long id, CreateAds ads);
 
-    boolean updateComments(long id);
+    boolean deleteComments(Integer id, String adPk);
+
+    boolean updateComments(Integer id, String adPk, Comment comment);
 
     boolean getAdsMe();
 }
