@@ -217,7 +217,7 @@ public class AdController {
                             description = "Объявление обновлено",
                             content = @Content(
                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = Ads.class)
+                                    schema = @Schema(implementation = Comment.class)
                             )
                     )
             },
