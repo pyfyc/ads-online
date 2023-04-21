@@ -47,6 +47,7 @@ public class AdController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
+
     @Operation(
             summary = "Получение комментариев",
             responses = {
@@ -69,6 +70,7 @@ public class AdController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+
     @Operation(
             summary = "Получение комментариев",
             responses = {
@@ -91,6 +93,7 @@ public class AdController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+
     @Operation(
             summary = "Добавление комментария",
             responses = {
