@@ -7,7 +7,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class ImageServiceImpl implements ImageService {
 
-
     @Override
     public boolean updateAdsImage(int adsId, MultipartFile file) {
         return true;

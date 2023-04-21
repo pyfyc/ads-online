@@ -1,7 +1,6 @@
 package com.skypro.adsonline.controller;
 
-import com.skypro.adsonline.dto.Image;
-import com.skypro.adsonline.dto.LoginReq;
+import com.skypro.adsonline.dto.Ads;
 import com.skypro.adsonline.service.ImageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -31,14 +30,18 @@ public class ImageController {
                             description = "Фотография обновлена",
                             content = @Content(
                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = Image.class)
+                                    schema = @Schema(implementation = Ads.class)
                             )
                     )
             },
             tags = "Обновление фотографии"
     )
-    @PatchMapping("/update-image")
-    public ResponseEntity<?> updateImage(@PathVariable int id, MultipartFile file) {
-        return ResponseEntity.ok(imageService.updateAdsImage(id, file));
+    @PatchMapping("/image/{id}")
+    public ResponseEntity<?> updateImage(@PathVariable int id, @RequestParam MultipartFile file) {
+        if (imageService.updateAdsImage(id, file)) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 }
