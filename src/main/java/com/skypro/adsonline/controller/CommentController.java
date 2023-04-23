@@ -1,8 +1,8 @@
 package com.skypro.adsonline.controller;
 
-import com.skypro.adsonline.dto.NewPassword;
-import com.skypro.adsonline.dto.User;
-import com.skypro.adsonline.service.UserService;
+import com.skypro.adsonline.dto.Comment;
+import com.skypro.adsonline.dto.ResponseWrapperComment;
+import com.skypro.adsonline.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,141 +13,145 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("users")
-public class UserController {
-    private final UserService userService;
+@RequestMapping("ads")
+public class CommentController {
+
+    private final CommentService commentService;
 
     @Operation(
-            summary = "Обновление пароля",
+            summary = "Получить комментарии объявления",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "Пароль изменен"
-                    ),
-                    @ApiResponse(
-                            responseCode = "401",
-                            description = "Unauthorized"
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description = "Forbidden"
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Not Found"
-                    )
-            },
-            tags = "Пользователи"
-    )
-    @PostMapping("/set_password")
-    public ResponseEntity<?> setPassword(@RequestBody NewPassword password) {
-        if (userService.setPassword(password.getCurrentPassword(), password.getNewPassword())) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-    }
-
-    @Operation(
-            summary = "Получить информацию об авторизованном пользователе",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Информация получена",
+                            description = "OK",
                             content = @Content(
                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = User.class)
+                                    schema = @Schema(implementation = ResponseWrapperComment.class)
                             )
                     ),
                     @ApiResponse(
-                            responseCode = "401",
-                            description = "Unauthorized"
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description = "Forbidden"
-                    ),
-                    @ApiResponse(
                             responseCode = "404",
                             description = "Not Found"
                     )
             },
-            tags = "Пользователи"
+            tags = "Комментарии"
     )
-    @GetMapping("/me")
-    public ResponseEntity<?> getUser() {
-        if (userService.getUser()) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-    }
-
-    @Operation(
-            summary = "Обновить информацию об авторизованном пользователе",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Пользователь изменен",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = User.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "204",
-                            description = "No Content"
-                    ),
-                    @ApiResponse(
-                            responseCode = "401",
-                            description = "Unauthorized"
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description = "Forbidden"
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Not Found"
-                    )
-            },
-            tags = "Пользователи"
-    )
-    @PatchMapping("/me")
-    public ResponseEntity<?> updateUser(@RequestBody User user) {
-        if (userService.updateUser(user)) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-    }
-
-    @Operation(
-            summary = "Обновить аватар авторизованного пользователя",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Фото изменено"
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Not Found"
-                    )
-            },
-            tags = "Пользователи"
-    )
-    @PatchMapping("/me/image")
-    public ResponseEntity<?> updateUserImage(@RequestPart(name = "image") MultipartFile image) {
-        if (userService.updateUserImage(image)) {
+    @GetMapping("{id}/comments")
+    public ResponseEntity<?> getComments(@PathVariable Integer id) {
+        if(commentService.getComments(id)) {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+
+    @Operation(
+            summary = "Добавить комментарий к объявлению",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "OK",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = Comment.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized"
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Forbidden"
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Not Found"
+                    )
+            },
+            tags = "Комментарии"
+    )
+    @PostMapping("/{id}/comments")
+    public ResponseEntity<?> addComment(@PathVariable Integer id, @RequestBody Comment comment) {
+        if(commentService.addComment(id, comment)) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    @Operation(
+            summary = "Удалить комментарий",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "OK"
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized"
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Forbidden"
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Not Found"
+                    )
+            },
+            tags = "Комментарии"
+    )
+    @DeleteMapping("/{adId}/comments/{commentId}")
+    public ResponseEntity<?> deleteComment(@PathVariable Integer adId, @PathVariable Integer commentId) {
+        if(commentService.deleteComment(adId, commentId)) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @Operation(
+            summary = "Обновить комментарий",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "OK",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = Comment.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized"
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Forbidden"
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Not Found"
+                    )
+            },
+            tags = "Комментарии"
+    )
+    @PatchMapping("/{adId}/comments/{commentId}")
+    public ResponseEntity<?> updateComment(
+            @PathVariable Integer adId,
+            @PathVariable Integer commentId,
+            @RequestBody Comment comment) {
+        if(commentService.updateComment(adId, commentId, comment)) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
 }

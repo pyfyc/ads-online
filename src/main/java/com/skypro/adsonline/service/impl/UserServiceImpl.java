@@ -3,6 +3,7 @@ package com.skypro.adsonline.service.impl;
 import com.skypro.adsonline.dto.User;
 import com.skypro.adsonline.service.UserService;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -23,7 +24,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean updateUserImage(String image) {
+    public boolean updateUserImage(MultipartFile image) {
         return false;
     }
 }
