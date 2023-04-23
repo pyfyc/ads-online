@@ -5,13 +5,10 @@ import com.skypro.adsonline.dto.RegisterReq;
 import com.skypro.adsonline.dto.Role;
 import com.skypro.adsonline.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,11 +29,19 @@ public class AuthController {
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "Пользователь авторизован",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = LoginReq.class)
-                            )
+                            description = "Пользователь авторизован"
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized"
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Forbidden"
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Not Found"
                     )
             },
             tags = "Авторизация"
@@ -54,15 +59,23 @@ public class AuthController {
             summary = "Регистрация пользователя",
             responses = {
                     @ApiResponse(
-                            responseCode = "200",
-                            description = "Пользователь зарегистрирован",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = RegisterReq.class)
-                            )
+                            responseCode = "201",
+                            description = "Created"
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized"
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Forbidden"
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Not Found"
                     )
             },
-            tags = "Авторизация"
+            tags = "Регистрация"
     )
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterReq req) {

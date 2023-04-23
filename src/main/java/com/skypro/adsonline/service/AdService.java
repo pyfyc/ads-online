@@ -1,30 +1,21 @@
 package com.skypro.adsonline.service;
 
-import com.skypro.adsonline.dto.Ads;
-import com.skypro.adsonline.dto.Comment;
 import com.skypro.adsonline.dto.CreateAds;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface AdService {
 
-    boolean addAds(Object properties, byte[] image);
+    boolean addAd(Object properties, MultipartFile image);
 
-    boolean getComments(String adPk);
+    boolean getAds(Integer id);
 
-    boolean getComments(String adPk, Integer id);
+    boolean removeAd(Integer id);
 
-    boolean addComments(String adPk, Comment comment);
-
-    boolean addComments(long id, String adPk);
-
-    boolean getFullAd(Integer id);
-
-    boolean removeAds(Integer id);
-
-    boolean updateAds(long id, CreateAds ads);
-
-    boolean deleteComments(Integer id, String adPk);
-
-    boolean updateComments(Integer id, String adPk, Comment comment);
+    boolean updateAds(Integer id, CreateAds ads);
 
     boolean getAdsMe();
+
+    boolean getAllAds();
+
+    boolean updateImage(Integer id, MultipartFile image);
 }

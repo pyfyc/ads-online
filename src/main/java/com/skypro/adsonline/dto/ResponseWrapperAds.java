@@ -5,6 +5,6 @@ import java.util.List;
 
 @Data
 public class ResponseWrapperAds {
-    private int count;
+    private int count; // общее количество объявлений
     private List<Ads> results;
 }

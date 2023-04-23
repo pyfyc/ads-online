@@ -1,9 +1,9 @@
 package com.skypro.adsonline.controller;
 
 import com.skypro.adsonline.dto.Ads;
-import com.skypro.adsonline.dto.Comment;
 import com.skypro.adsonline.dto.CreateAds;
-import com.skypro.adsonline.dto.User;
+import com.skypro.adsonline.dto.FullAds;
+import com.skypro.adsonline.dto.ResponseWrapperAds;
 import com.skypro.adsonline.service.AdService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
@@ -26,22 +27,22 @@ public class AdController {
     private final AdService adService;
 
     @Operation(
-            summary = "Добавление объявления",
+            summary = "Получить все объявления",
             responses = {
                     @ApiResponse(
-                            responseCode = "200",
-                            description = "Объявление добавлено",
+                            responseCode = "201",
+                            description = "OK",
                             content = @Content(
                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = Ads.class)
+                                    schema = @Schema(implementation = ResponseWrapperAds.class)
                             )
                     )
             },
             tags = "Объявления"
     )
-    @PostMapping
-    public ResponseEntity<?> addAds(@RequestBody Object properties, @RequestBody byte[] image) {
-        if(adService.addAds(properties, image)) {
+    @GetMapping()
+    public ResponseEntity<?> getAllAds() {
+        if(adService.getAllAds()) {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -49,68 +50,36 @@ public class AdController {
     }
 
     @Operation(
-            summary = "Получение комментариев",
+            summary = "Добавить объявление",
             responses = {
                     @ApiResponse(
-                            responseCode = "200",
-                            description = "Комментарии получены",
+                            responseCode = "201",
+                            description = "Created",
                             content = @Content(
                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = Comment.class)
+                                    schema = @Schema(implementation = Ads.class)
                             )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized"
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Forbidden"
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Not Found"
                     )
             },
             tags = "Объявления"
     )
-    @GetMapping("/{ad_pk}/comments")
-    public ResponseEntity<?> getComments(@PathVariable("ad_pk") String adPk) {
-        if(adService.getComments(adPk)) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
-
-    @Operation(
-            summary = "Получение комментариев",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Комментарии получены",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = Comment.class)
-                            )
-                    )
-            },
-            tags = "Объявления"
-    )
-    @GetMapping("{ad_pk}/comments/{id}")
-    public ResponseEntity<?> getComments(@PathVariable("ad_pk") String adPk, @PathVariable Integer id) {
-        if(adService.getComments(adPk, id)) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
-
-    @Operation(
-            summary = "Добавление комментария",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Комментарий добавлен",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = Comment.class)
-                            )
-                    )
-            },
-            tags = "Объявления"
-    )
-    @PostMapping("/{ad_pk}/comments")
-    public ResponseEntity<?> addComments(@PathVariable("ad_pk") String adPk, @RequestBody Comment comment) {
-        if(adService.addComments(adPk, comment)) {
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<?> addAd(
+            @RequestPart Object properties,
+            @RequestPart(name = "image") MultipartFile image) {
+        if(adService.addAd(properties, image)) {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -118,22 +87,26 @@ public class AdController {
     }
 
     @Operation(
-            summary = "Получение полного объявления",
+            summary = "Получить информацию об объявлении",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "Объявление получено",
+                            description = "OK",
                             content = @Content(
                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = Ads.class)
+                                    schema = @Schema(implementation = FullAds.class)
                             )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Not Found"
                     )
             },
             tags = "Объявления"
     )
     @GetMapping("/{id}")
-    public ResponseEntity<?> getFullAd(@PathVariable("id") Integer id) {
-        if(adService.getFullAd(id)) {
+    public ResponseEntity<?> getAds(@PathVariable("id") Integer id) {
+        if(adService.getAds(id)) {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -141,22 +114,26 @@ public class AdController {
     }
 
     @Operation(
-            summary = "Удаление объявления",
+            summary = "Удалить объявление",
             responses = {
                     @ApiResponse(
-                            responseCode = "200",
-                            description = "Объявление удалено",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = Ads.class)
-                            )
+                            responseCode = "204",
+                            description = "No Content"
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized"
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Forbidden"
                     )
             },
             tags = "Объявления"
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> removeAds(@PathVariable("id") Integer id) {
-        if(adService.removeAds(id)) {
+    public ResponseEntity<?> removeAd(@PathVariable("id") Integer id) {
+        if(adService.removeAd(id)) {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -164,15 +141,27 @@ public class AdController {
     }
 
     @Operation(
-            summary = "Обновление объявления",
+            summary = "Обновить информацию об объявлении",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "Объявление обновлено",
+                            description = "OK",
                             content = @Content(
                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = Ads.class)
                             )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized"
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Forbidden"
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Not Found"
                     )
             },
             tags = "Объявления"
@@ -187,71 +176,62 @@ public class AdController {
     }
 
     @Operation(
-            summary = "Удаление комментария",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Комментарий удален",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = Comment.class)
-                            )
-                    )
-            },
-            tags = "Объявления"
-    )
-    @DeleteMapping("/ads/{ad_pk}/comments/{id}")
-    public ResponseEntity<?> deleteComments(@PathVariable("id") Integer id, @PathVariable("ad_pk") String adPk) {
-        if(adService.deleteComments(id, adPk)) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
-
-    @Operation(
-            summary = "Обновления комментария",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Объявление обновлено",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = Comment.class)
-                            )
-                    )
-            },
-            tags = "Объявления"
-    )
-    @PatchMapping("/ads/{ad_pk}/comments/{id}")
-    public ResponseEntity<?> updateComments(@PathVariable("id") Integer id, @PathVariable("ad_pk") String adPk, @RequestBody Comment comment) {
-        if(adService.updateComments(id, adPk, comment)) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
-
-    @Operation(
             summary = "Получение моих объявлений",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "Объявления получены",
+                            description = "OK",
                             content = @Content(
                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = Ads.class)
+                                    schema = @Schema(implementation = ResponseWrapperAds.class)
                             )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized"
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Forbidden"
                     )
             },
             tags = "Объявления"
     )
-    @GetMapping("/ads/me")
+    @GetMapping("/me")
     public ResponseEntity<?> getAdsMe() {
         if(adService.getAdsMe()) {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    @Operation(
+            summary = "Обновить картинку объявления",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "OK",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE,
+                                    schema = @Schema(implementation = String[].class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Not Found"
+                    )
+            },
+            tags = "Объявления"
+    )
+    @PatchMapping("/{id}/image")
+    public ResponseEntity<?> updateImage(
+            @PathVariable("id") Integer id,
+            @RequestPart(name = "image") MultipartFile image) {
+        if(adService.updateImage(id, image)) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }

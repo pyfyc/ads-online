@@ -1,65 +1,45 @@
 package com.skypro.adsonline.service.impl;
 
-import com.skypro.adsonline.dto.Comment;
 import com.skypro.adsonline.dto.CreateAds;
 import com.skypro.adsonline.service.AdService;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class AdServiceImpl implements AdService {
 
     @Override
-    public boolean addAds(Object properties, byte[] image) {
+    public boolean addAd(Object properties, MultipartFile image) {
         return false;
     }
 
     @Override
-    public boolean getComments(String adPk) {
+    public boolean getAds(Integer id) {
         return false;
     }
 
     @Override
-    public boolean getComments(String adPk, Integer id) {
+    public boolean removeAd(Integer id) {
         return false;
     }
 
     @Override
-    public boolean addComments(String adPk, Comment comment) {
-        return false;
-    }
-
-    @Override
-    public boolean addComments(long id, String adPk) {
-        return false;
-    }
-
-    @Override
-    public boolean getFullAd(Integer id) {
-        return false;
-    }
-
-    @Override
-    public boolean removeAds(Integer id) {
-        return false;
-    }
-
-    @Override
-    public boolean updateAds(long id, CreateAds ads) {
-        return false;
-    }
-
-    @Override
-    public boolean deleteComments(Integer id, String adPk) {
-        return false;
-    }
-
-    @Override
-    public boolean updateComments(Integer id, String adPk, Comment comment) {
+    public boolean updateImage(Integer id, MultipartFile image) {
         return false;
     }
 
     @Override
     public boolean getAdsMe() {
+        return false;
+    }
+
+    @Override
+    public boolean getAllAds() {
+        return false;
+    }
+
+    @Override
+    public boolean updateAds(Integer id, CreateAds ads) {
         return false;
     }
 }
