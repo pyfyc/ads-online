@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class AdServiceImpl implements AdService {
 
     @Override
-    public boolean addAd(Object properties, MultipartFile image) {
+    public boolean addAd(CreateAds properties, MultipartFile image) {
         return false;
     }
 

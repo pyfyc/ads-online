@@ -5,7 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface AdService {
 
-    boolean addAd(Object properties, MultipartFile image);
+    boolean addAd(CreateAds properties, MultipartFile image);
 
     boolean getAds(Integer id);
 

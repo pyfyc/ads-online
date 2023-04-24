@@ -77,7 +77,7 @@ public class AdController {
     )
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> addAd(
-            @RequestPart Object properties,
+            @RequestPart CreateAds properties,
             @RequestPart(name = "image") MultipartFile image) {
         if(adService.addAd(properties, image)) {
             return ResponseEntity.ok().build();
@@ -224,7 +224,7 @@ public class AdController {
             },
             tags = "Объявления"
     )
-    @PatchMapping("/{id}/image")
+    @PatchMapping(value = "/{id}/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> updateImage(
             @PathVariable("id") Integer id,
             @RequestPart(name = "image") MultipartFile image) {
