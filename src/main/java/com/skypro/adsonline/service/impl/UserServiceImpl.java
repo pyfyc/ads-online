@@ -26,6 +26,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUser() {
+        // todo: need to return currently logged in user (not the 1st user)
         UserEntity user = userRepository.findById(1).orElse(null);
         if (user != null) {
             return userMapper.mapToUserDto(user);
