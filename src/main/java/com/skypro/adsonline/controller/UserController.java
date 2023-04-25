@@ -81,9 +81,10 @@ public class UserController {
             tags = "Пользователи"
     )
     @GetMapping("/me")
-    public ResponseEntity<?> getUser() {
-        if (userService.getUser()) {
-            return ResponseEntity.ok().build();
+    public ResponseEntity<User> getUser() {
+        User user = userService.getUser();
+        if (user != null) {
+            return ResponseEntity.ok(user);
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
