@@ -1,4 +1,4 @@
-package com.skypro.adsonline;
+package com.skypro.adsonline.security;
 
 import org.springframework.context.annotation.Configuration;
 
