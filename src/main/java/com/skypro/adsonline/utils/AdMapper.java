@@ -8,12 +8,9 @@ import com.skypro.adsonline.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-
 @Service
 public class AdMapper {
-
     private final UserRepository userRepository;
-
     public AdMapper(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
