@@ -43,4 +43,20 @@ public class CommentMapper {
         entity.setText(dto.getText());
         return entity;
     }
+
+    /**
+     * Entity -> dto mapping
+     * @param entity input entity class
+     * @return dto class
+     */
+    public Comment mapToCommentDto(CommentEntity entity) {
+        Comment dto = new Comment();
+        dto.setAuthor(entity.getAuthor().getId());
+        dto.setAuthorImage(entity.getAuthor().getImage());
+        dto.setAuthorFirstName(entity.getAuthor().getFirstName());
+        dto.setCreatedAt(entity.getCreatedAt());
+        dto.setPk(entity.getId());
+        dto.setText(entity.getText());
+        return dto;
+    }
 }
