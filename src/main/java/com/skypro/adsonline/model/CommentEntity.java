@@ -9,7 +9,6 @@ import lombok.Setter;
 @Setter
 @Table(name = "comments")
 public class CommentEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -21,4 +20,5 @@ public class CommentEntity {
     private AdEntity ad;
     private long createdAt;
     private String text;
+
 }

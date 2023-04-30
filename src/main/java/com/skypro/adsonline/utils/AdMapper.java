@@ -10,22 +10,19 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class AdMapper {
-
     private final UserRepository userRepository;
-
     public AdMapper(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     /**
-     * Dto -> entity mapping
-     * @param dto input dto class
-     * @param image ad image
-     * @return entity class
+     * Entity -> dto mapping
+     * @param dto input entity class
+     * @return dto class
      */
     public AdEntity mapToAdEntity(CreateAds dto, MultipartFile image) {
 
-        // todo: Need to use currently logged in user here (not hardcoded user)
+        //todo: Need to use currently logged in user here (not hardcoded user)
         UserEntity author = userRepository.findById(1).orElse(null);
 
         AdEntity entity = new AdEntity();
@@ -42,7 +39,7 @@ public class AdMapper {
      * @param entity input entity class
      * @return dto class
      */
-    public Ads mapToAdsDto(AdEntity entity) {
+    public Ads mapToAdDto(AdEntity entity){
         Ads dto = new Ads();
         dto.setAuthor(entity.getAuthor().getId());
         dto.setImage(entity.getImage());
