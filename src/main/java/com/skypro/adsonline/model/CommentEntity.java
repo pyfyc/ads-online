@@ -7,14 +7,18 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "Comments")
+@Table(name = "comments")
 public class CommentEntity {
-    private Integer author; // id автора комментария
-    private String authorImage; // ссылка на аватар автора комментария
-    private String authorFirstName; // имя создателя комментария
-    private long createdAt; // дата и время создания комментария в миллисекундах с 00:00:00 01.01.1970
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer pk; // id комментария
-    private String text; // текст комментария
+    private Integer id;
+    @ManyToOne
+    @JoinColumn(name = "author_id", foreignKey = @ForeignKey(name = "fk_comments_users"))
+    private UserEntity author;
+    @ManyToOne
+    @JoinColumn(name = "ad_id", foreignKey = @ForeignKey(name = "fk_comments_ads"))
+    private AdEntity ad;
+    private long createdAt;
+    private String text;
+
 }
