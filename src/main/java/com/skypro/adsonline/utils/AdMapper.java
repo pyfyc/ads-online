@@ -43,9 +43,6 @@ public class AdMapper {
      * @return dto class
      */
     public Ads mapToAdDto(AdEntity entity){
-        //todo: Need to use currently logged in user here (not hardcoded user)
-        UserEntity author = userRepository.findById(1).orElse(null);
-
         Ads dto = new Ads();
         dto.setAuthor(entity.getAuthor().getId());
         dto.setImage(entity.getImage());
