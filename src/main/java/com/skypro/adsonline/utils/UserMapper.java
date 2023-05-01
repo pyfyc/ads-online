@@ -14,7 +14,7 @@ public class UserMapper {
      */
     public UserEntity mapToUserEntity(RegisterReq dto){
         UserEntity entity = new UserEntity();
-        entity.setEmail(dto.getUsername());
+        entity.setUsername(dto.getUsername());
         entity.setPassword(dto.getPassword());
         entity.setFirstName(dto.getFirstName());
         entity.setLastName(dto.getLastName());
@@ -31,7 +31,7 @@ public class UserMapper {
     public User mapToUserDto(UserEntity entity) {
         User dto = new User();
         dto.setId(entity.getId());
-        dto.setEmail(entity.getEmail());
+        dto.setEmail(entity.getUsername());
         dto.setFirstName(entity.getFirstName());
         dto.setLastName(entity.getLastName());
         dto.setPhone(entity.getPhone());
