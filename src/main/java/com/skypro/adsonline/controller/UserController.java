@@ -2,6 +2,7 @@ package com.skypro.adsonline.controller;
 
 import com.skypro.adsonline.dto.NewPassword;
 import com.skypro.adsonline.dto.User;
+import com.skypro.adsonline.security.SecurityUser;
 import com.skypro.adsonline.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -81,8 +83,8 @@ public class UserController {
             tags = "Пользователи"
     )
     @GetMapping("/me")
-    public ResponseEntity<User> getUser() {
-        User user = userService.getUser();
+    public ResponseEntity<User> getUser(@AuthenticationPrincipal SecurityUser currentUser) {
+        User user = userService.getUser(currentUser);
         if (user != null) {
             return ResponseEntity.ok(user);
         } else {

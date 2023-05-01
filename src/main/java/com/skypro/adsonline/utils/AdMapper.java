@@ -29,6 +29,7 @@ public class AdMapper {
         entity.setTitle(dto.getTitle());
         entity.setDescription(dto.getDescription());
         entity.setPrice(dto.getPrice());
+        //todo: BizinMitya: про valueOf потом не забудьте переделать)
         entity.setImage(String.valueOf(image));
         entity.setAuthor(author);
         return entity;
