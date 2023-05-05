@@ -48,9 +48,11 @@ public class UserController {
             tags = "Пользователи"
     )
     @PostMapping("/set_password")
-    public ResponseEntity<?> setPassword(@RequestBody NewPassword password) {
-        if (userService.setPassword(password.getCurrentPassword(), password.getNewPassword())) {
-            return ResponseEntity.ok().build();
+    public ResponseEntity<User> setPassword(@RequestBody NewPassword password,
+                                            @AuthenticationPrincipal SecurityUser currentUser) {
+        User user = userService.setPassword(password, currentUser);
+        if (user != null) {
+            return ResponseEntity.ok(user);
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -123,8 +125,9 @@ public class UserController {
             tags = "Пользователи"
     )
     @PatchMapping("/me")
-    public ResponseEntity<?> updateUser(@RequestBody User user) {
-        if (userService.updateUser(user)) {
+    public ResponseEntity<?> updateUser(@RequestBody User user,
+                                        @AuthenticationPrincipal SecurityUser currentUser) {
+        if (userService.updateUser(user, currentUser)) {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
