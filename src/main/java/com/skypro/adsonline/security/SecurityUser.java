@@ -1,5 +1,6 @@
 package com.skypro.adsonline.security;
 
+import com.skypro.adsonline.dto.Role;
 import com.skypro.adsonline.model.UserEntity;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -51,4 +52,5 @@ public class SecurityUser implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }
