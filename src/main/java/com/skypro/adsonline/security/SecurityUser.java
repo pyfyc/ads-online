@@ -53,16 +53,4 @@ public class SecurityUser implements UserDetails {
         return true;
     }
 
-    public boolean canChangePassword() {
-        UserEntity currentUser  = getUser();
-        if (currentUser == null) {
-            return false;
-        }
-        if (currentUser.getRole() == Role.ADMIN || currentUser.getRole() == Role.USER) {
-            return true;
-        }
-        return false;
-    }
-
-
 }

@@ -56,9 +56,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public User setPassword(NewPassword newPasswordDto, SecurityUser currentUser) {
         UserEntity user = checkUserByUsername(currentUser.getUsername());
-        if (!currentUser.canChangePassword()) {
-            throw new AccessDeniedException("Пользователю не разрешается менять пароль");
-        }
         String encryptedPassword = user.getPassword();
         if (!passwordEncoder.matches(newPasswordDto.getCurrentPassword(), encryptedPassword)) {
             throw new WrongPasswordException("Текущий пароль пользователя неверен");
@@ -89,7 +86,6 @@ public class UserServiceImpl implements UserService {
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
         user.setPhone(userDto.getPhone());
-
         userRepository.save(user);
         return true;
     }
