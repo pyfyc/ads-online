@@ -83,7 +83,7 @@ public class CommentController {
     public ResponseEntity<Comment> addComment(@PathVariable Integer id, @RequestBody Comment comment) {
         Comment newComment = commentService.addComment(id, comment);
         if(newComment != null) {
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(newComment);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -112,10 +112,13 @@ public class CommentController {
             tags = "Комментарии"
     )
     @DeleteMapping("/{adId}/comments/{commentId}")
-    public ResponseEntity<Void> deleteComment(@PathVariable Integer adId,
-                                              @PathVariable Integer commentId) {
-        commentService.deleteComment(adId, commentId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> deleteComment(@PathVariable Integer adId,
+                                           @PathVariable Integer commentId) {
+        if(commentService.deleteComment(adId, commentId)) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @Operation(
