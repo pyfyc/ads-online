@@ -4,6 +4,7 @@ import com.skypro.adsonline.dto.Ads;
 import com.skypro.adsonline.dto.CreateAds;
 import com.skypro.adsonline.dto.FullAds;
 import com.skypro.adsonline.dto.ResponseWrapperAds;
+import com.skypro.adsonline.security.SecurityUser;
 import com.skypro.adsonline.service.AdService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,9 +43,10 @@ public class AdController {
             tags = "Объявления"
     )
     @GetMapping()
-    public ResponseEntity<?> getAllAds() {
-        if(adService.getAllAds()) {
-            return ResponseEntity.ok().build();
+    public ResponseEntity<ResponseWrapperAds> getAllAds() {
+        ResponseWrapperAds ads = adService.getAllAds();
+        if(ads != null) {
+            return ResponseEntity.ok(ads);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -76,11 +79,13 @@ public class AdController {
             tags = "Объявления"
     )
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<?> addAd(
-            @RequestPart CreateAds properties,
-            @RequestPart(name = "image") MultipartFile image) {
-        if(adService.addAd(properties, image)) {
-            return ResponseEntity.ok().build();
+    public ResponseEntity<Ads> addAd(
+                @RequestPart CreateAds properties,
+                @RequestPart(name = "image") MultipartFile image,
+                @AuthenticationPrincipal SecurityUser currentUser) {
+        Ads ad = adService.addAd(properties, image, currentUser);
+        if(ad != null) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(ad);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -105,9 +110,10 @@ public class AdController {
             tags = "Объявления"
     )
     @GetMapping("/{id}")
-    public ResponseEntity<?> getAds(@PathVariable("id") Integer id) {
-        if(adService.getAds(id)) {
-            return ResponseEntity.ok().build();
+    public ResponseEntity<FullAds> getAds(@PathVariable("id") Integer id) {
+        FullAds fullAd = adService.getAds(id);
+        if(fullAd != null) {
+            return ResponseEntity.ok(fullAd);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
@@ -167,9 +173,10 @@ public class AdController {
             tags = "Объявления"
     )
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateAds(@PathVariable("id") Integer id, @RequestBody CreateAds ads) {
-        if(adService.updateAds(id, ads)) {
-            return ResponseEntity.ok().build();
+    public ResponseEntity<Ads> updateAds(@PathVariable("id") Integer id, @RequestBody CreateAds ads) {
+        Ads ad = adService.updateAds(id, ads);
+        if(ad != null) {
+            return ResponseEntity.ok(ad);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
@@ -198,9 +205,42 @@ public class AdController {
             tags = "Объявления"
     )
     @GetMapping("/me")
-    public ResponseEntity<?> getAdsMe() {
-        if(adService.getAdsMe()) {
-            return ResponseEntity.ok().build();
+    public ResponseEntity<ResponseWrapperAds> getAdsMe(@AuthenticationPrincipal SecurityUser currentUser) {
+        ResponseWrapperAds ads = adService.getAdsMe(currentUser);
+        if(ads != null) {
+            return ResponseEntity.ok(ads);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    @Operation(
+            summary = "Поиск объявлений по названию",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "OK",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ResponseWrapperAds.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Bad Request"
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized"
+                    )
+            },
+            tags = "Объявления"
+    )
+    @GetMapping("/title-like")
+    public ResponseEntity<ResponseWrapperAds> getAdsByTitleLike(@RequestParam String title) {
+        ResponseWrapperAds ads = adService.getAdsByTitleLike(title);
+        if (ads != null) {
+            return ResponseEntity.ok(ads);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }

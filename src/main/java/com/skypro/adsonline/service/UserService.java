@@ -7,13 +7,9 @@ import com.skypro.adsonline.security.SecurityUser;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
-    boolean setPassword(String currentPassword, String newPassword);
-    User getUser(SecurityUser currentUser);
-    boolean updateUser(User user);
-    boolean updateUserImage(MultipartFile image);
     User setPassword(NewPassword newPasswordDto, SecurityUser currentUser);
-
-    UserEntity checkUserByUsername(String username);
-
+    User getUser(SecurityUser currentUser);
     boolean updateUser(User userDto, SecurityUser currentUser);
+    boolean updateUserImage(MultipartFile image);
+    UserEntity checkUserByUsername(String username);
 }
