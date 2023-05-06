@@ -9,16 +9,17 @@ import com.skypro.adsonline.repository.UserRepository;
 import com.skypro.adsonline.security.SecurityUser;
 import com.skypro.adsonline.service.UserService;
 import com.skypro.adsonline.utils.UserMapper;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import static com.skypro.adsonline.constant.ErrorMessage.USER_NOT_FOUND_MSG;
+import static com.skypro.adsonline.constant.ErrorMessage.WRONG_PASS_MSG;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
@@ -26,11 +27,6 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
-    }
-
-    @Override
-    public boolean setPassword(String currentPassword, String newPassword) {
-        return false;
     }
 
     @Override
@@ -44,11 +40,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean updateUser(User user) {
-        return false;
-    }
-
-    @Override
     public boolean updateUserImage(MultipartFile image) {
         return false;
     }
@@ -58,7 +49,7 @@ public class UserServiceImpl implements UserService {
         UserEntity user = checkUserByUsername(currentUser.getUsername());
         String encryptedPassword = user.getPassword();
         if (!passwordEncoder.matches(newPasswordDto.getCurrentPassword(), encryptedPassword)) {
-            throw new WrongPasswordException("Текущий пароль пользователя неверен");
+            throw new WrongPasswordException(WRONG_PASS_MSG.formatted(currentUser.getUsername()));
         }
 
         String newPassword = newPasswordDto.getNewPassword();
@@ -74,7 +65,7 @@ public class UserServiceImpl implements UserService {
     public UserEntity checkUserByUsername(String username) {
         UserEntity user = userRepository.findByUsername(username);
         if (user == null) {
-            throw new UserNotFoundException("Пользователь не найден");
+            throw new UserNotFoundException(USER_NOT_FOUND_MSG.formatted(username));
         }
         return user;
     }

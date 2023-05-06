@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import static com.skypro.adsonline.constant.ErrorMessage.USER_NOT_FOUND_MSG;
+
 @Service
 public class JpaUserDetailsService implements UserDetailsService {
 
@@ -27,7 +29,7 @@ public class JpaUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) {
         UserEntity userFromDb = userRepository.findByUsername(username);
         if (userFromDb == null) {
-            throw new UserNotFoundException("User %s not found".formatted(username));
+            throw new UserNotFoundException(USER_NOT_FOUND_MSG.formatted(username));
         }
         return new SecurityUser(userFromDb);
     }

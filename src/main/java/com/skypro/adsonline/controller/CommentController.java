@@ -51,8 +51,6 @@ public class CommentController {
         }
     }
 
-
-
     @Operation(
             summary = "Добавить комментарий к объявлению",
             responses = {
