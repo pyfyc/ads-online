@@ -42,13 +42,16 @@ public class CommentController {
             tags = "Комментарии"
     )
     @GetMapping("{id}/comments")
-    public ResponseEntity<?> getComments(@PathVariable Integer id) {
-        if(commentService.getComments(id)) {
-            return ResponseEntity.ok().build();
+    public ResponseEntity<ResponseWrapperComment> getComments(@PathVariable Integer id) {
+        ResponseWrapperComment comments = commentService.getComments(id);
+        if(comments != null) {
+            return ResponseEntity.ok(comments);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+
+
 
     @Operation(
             summary = "Добавить комментарий к объявлению",
@@ -77,9 +80,10 @@ public class CommentController {
             tags = "Комментарии"
     )
     @PostMapping("/{id}/comments")
-    public ResponseEntity<?> addComment(@PathVariable Integer id, @RequestBody Comment comment) {
-        if(commentService.addComment(id, comment)) {
-            return ResponseEntity.ok().build();
+    public ResponseEntity<Comment> addComment(@PathVariable Integer id, @RequestBody Comment comment) {
+        Comment newComment = commentService.addComment(id, comment);
+        if(newComment != null) {
+            return ResponseEntity.ok(newComment);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -108,7 +112,8 @@ public class CommentController {
             tags = "Комментарии"
     )
     @DeleteMapping("/{adId}/comments/{commentId}")
-    public ResponseEntity<?> deleteComment(@PathVariable Integer adId, @PathVariable Integer commentId) {
+    public ResponseEntity<?> deleteComment(@PathVariable Integer adId,
+                                           @PathVariable Integer commentId) {
         if(commentService.deleteComment(adId, commentId)) {
             return ResponseEntity.ok().build();
         } else {
@@ -143,15 +148,15 @@ public class CommentController {
             tags = "Комментарии"
     )
     @PatchMapping("/{adId}/comments/{commentId}")
-    public ResponseEntity<?> updateComment(
+    public ResponseEntity<Comment> updateComment(
             @PathVariable Integer adId,
             @PathVariable Integer commentId,
             @RequestBody Comment comment) {
-        if(commentService.updateComment(adId, commentId, comment)) {
-            return ResponseEntity.ok().build();
+        Comment updateComment = commentService.updateComment(adId, commentId, comment);
+        if(updateComment != null) {
+            return ResponseEntity.ok(updateComment);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
-
 }
