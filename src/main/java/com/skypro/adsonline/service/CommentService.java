@@ -1,14 +1,15 @@
 package com.skypro.adsonline.service;
 
 import com.skypro.adsonline.dto.Comment;
+import com.skypro.adsonline.dto.ResponseWrapperComment;
 
 public interface CommentService {
 
-    boolean getComments(Integer id);
+    ResponseWrapperComment getComments(Integer id);
 
-    boolean addComment(Integer id, Comment comment);
+    Comment addComment(Integer id, Comment comment);
 
     boolean deleteComment(Integer adId, Integer commentId);
 
-    boolean updateComment(Integer adId, Integer commentId, Comment comment);
+    Comment updateComment(Integer adId, Integer commentId, Comment comment);
 }
