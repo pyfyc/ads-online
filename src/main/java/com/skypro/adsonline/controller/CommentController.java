@@ -2,6 +2,7 @@ package com.skypro.adsonline.controller;
 
 import com.skypro.adsonline.dto.Comment;
 import com.skypro.adsonline.dto.ResponseWrapperComment;
+import com.skypro.adsonline.security.SecurityUser;
 import com.skypro.adsonline.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -35,8 +37,8 @@ public class CommentController {
                             )
                     ),
                     @ApiResponse(
-                            responseCode = "404",
-                            description = "Not Found"
+                            responseCode = "401",
+                            description = "Unauthorized"
                     )
             },
             tags = "Комментарии"
@@ -65,21 +67,16 @@ public class CommentController {
                     @ApiResponse(
                             responseCode = "401",
                             description = "Unauthorized"
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description = "Forbidden"
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Not Found"
                     )
             },
             tags = "Комментарии"
     )
     @PostMapping("/{id}/comments")
-    public ResponseEntity<Comment> addComment(@PathVariable Integer id, @RequestBody Comment comment) {
-        Comment newComment = commentService.addComment(id, comment);
+    public ResponseEntity<Comment> addComment(
+                    @PathVariable Integer id,
+                    @RequestBody Comment comment,
+                    @AuthenticationPrincipal SecurityUser currentUser) {
+        Comment newComment = commentService.addComment(id, comment, currentUser);
         if(newComment != null) {
             return ResponseEntity.ok(newComment);
         } else {
@@ -101,10 +98,6 @@ public class CommentController {
                     @ApiResponse(
                             responseCode = "403",
                             description = "Forbidden"
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Not Found"
                     )
             },
             tags = "Комментарии"
@@ -137,10 +130,6 @@ public class CommentController {
                     @ApiResponse(
                             responseCode = "403",
                             description = "Forbidden"
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Not Found"
                     )
             },
             tags = "Комментарии"

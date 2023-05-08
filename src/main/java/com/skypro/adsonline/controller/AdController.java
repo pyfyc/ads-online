@@ -32,7 +32,7 @@ public class AdController {
             summary = "Получить все объявления",
             responses = {
                     @ApiResponse(
-                            responseCode = "201",
+                            responseCode = "200",
                             description = "OK",
                             content = @Content(
                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -66,14 +66,6 @@ public class AdController {
                     @ApiResponse(
                             responseCode = "401",
                             description = "Unauthorized"
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description = "Forbidden"
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Not Found"
                     )
             },
             tags = "Объявления"
@@ -103,8 +95,8 @@ public class AdController {
                             )
                     ),
                     @ApiResponse(
-                            responseCode = "404",
-                            description = "Not Found"
+                            responseCode = "401",
+                            description = "Unauthorized"
                     )
             },
             tags = "Объявления"
@@ -164,10 +156,6 @@ public class AdController {
                     @ApiResponse(
                             responseCode = "403",
                             description = "Forbidden"
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Not Found"
                     )
             },
             tags = "Объявления"
@@ -183,7 +171,7 @@ public class AdController {
     }
 
     @Operation(
-            summary = "Получение моих объявлений",
+            summary = "Получить объявления авторизованного пользователя",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -196,10 +184,6 @@ public class AdController {
                     @ApiResponse(
                             responseCode = "401",
                             description = "Unauthorized"
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description = "Forbidden"
                     )
             },
             tags = "Объявления"
@@ -258,8 +242,12 @@ public class AdController {
                             )
                     ),
                     @ApiResponse(
-                            responseCode = "404",
-                            description = "Not Found"
+                            responseCode = "401",
+                            description = "Unauthorized"
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Forbidden"
                     )
             },
             tags = "Объявления"

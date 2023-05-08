@@ -8,6 +8,7 @@ import com.skypro.adsonline.model.AdEntity;
 import com.skypro.adsonline.model.CommentEntity;
 import com.skypro.adsonline.repository.AdRepository;
 import com.skypro.adsonline.repository.CommentRepository;
+import com.skypro.adsonline.security.SecurityUser;
 import com.skypro.adsonline.service.CommentService;
 import com.skypro.adsonline.utils.CommentMapper;
 import org.springframework.stereotype.Service;
@@ -39,11 +40,11 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Comment addComment(Integer id, Comment commentDto) {
+    public Comment addComment(Integer id, Comment commentDto, SecurityUser currentUser) {
         AdEntity ad = adRepository.findById(id).orElseThrow(() -> new AdNotFoundException(AD_NOT_FOUND_MSG.formatted(id)));
 
         CommentEntity comment = new CommentEntity();
-        comment.setAuthor(ad.getAuthor());
+        comment.setAuthor(currentUser.getUser());
         comment.setAd(ad);
         comment.setCreatedAt(System.currentTimeMillis());
         comment.setText(commentDto.getText());
