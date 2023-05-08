@@ -34,14 +34,6 @@ public class AuthController {
                     @ApiResponse(
                             responseCode = "401",
                             description = "Unauthorized"
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description = "Forbidden"
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Not Found"
                     )
             },
             tags = "Авторизация"
@@ -61,18 +53,6 @@ public class AuthController {
                     @ApiResponse(
                             responseCode = "201",
                             description = "Created"
-                    ),
-                    @ApiResponse(
-                            responseCode = "401",
-                            description = "Unauthorized"
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description = "Forbidden"
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Not Found"
                     )
             },
             tags = "Регистрация"

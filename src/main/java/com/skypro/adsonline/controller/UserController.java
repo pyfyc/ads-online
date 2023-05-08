@@ -39,10 +39,6 @@ public class UserController {
                     @ApiResponse(
                             responseCode = "403",
                             description = "Forbidden"
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Not Found"
                     )
             },
             tags = "Пользователи"
@@ -72,14 +68,6 @@ public class UserController {
                     @ApiResponse(
                             responseCode = "401",
                             description = "Unauthorized"
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description = "Forbidden"
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Not Found"
                     )
             },
             tags = "Пользователи"
@@ -106,20 +94,8 @@ public class UserController {
                             )
                     ),
                     @ApiResponse(
-                            responseCode = "204",
-                            description = "No Content"
-                    ),
-                    @ApiResponse(
                             responseCode = "401",
                             description = "Unauthorized"
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description = "Forbidden"
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Not Found"
                     )
             },
             tags = "Пользователи"
@@ -142,8 +118,8 @@ public class UserController {
                             description = "Фото изменено"
                     ),
                     @ApiResponse(
-                            responseCode = "404",
-                            description = "Not Found"
+                            responseCode = "401",
+                            description = "Unauthorized"
                     )
             },
             tags = "Пользователи"
