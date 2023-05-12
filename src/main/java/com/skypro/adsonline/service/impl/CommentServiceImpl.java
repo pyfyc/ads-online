@@ -59,8 +59,8 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public boolean deleteComment(Integer adId, Integer commentId, SecurityUser currentUser) {
+        checkPermission(commentId, currentUser);
         CommentEntity comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(COMMENT_NOT_FOUND_MSG.formatted(commentId)));
-        checkPermission(comment.getId(), currentUser);
         commentRepository.delete(comment);
         return true;
     }
@@ -69,9 +69,9 @@ public class CommentServiceImpl implements CommentService {
     public Comment updateComment(Integer adId, Integer commentId, Comment comment, SecurityUser currentUser) {
         AdEntity ad = adRepository.findById(adId).
                 orElseThrow(() -> new AdNotFoundException(AD_NOT_FOUND_MSG.formatted(adId)));
+        checkPermission(commentId, currentUser);
         CommentEntity foundComment = commentRepository.findById(commentId).
                 orElseThrow(() -> new CommentNotFoundException(COMMENT_NOT_FOUND_MSG.formatted(commentId)));
-        checkPermission(foundComment.getId(), currentUser);
         foundComment.setText(comment.getText());
         commentRepository.save(foundComment);
         return commentMapper.mapToCommentDto(foundComment);
