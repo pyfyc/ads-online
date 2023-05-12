@@ -104,8 +104,9 @@ public class CommentController {
     )
     @DeleteMapping("/{adId}/comments/{commentId}")
     public ResponseEntity<?> deleteComment(@PathVariable Integer adId,
-                                           @PathVariable Integer commentId) {
-        if(commentService.deleteComment(adId, commentId)) {
+                                           @PathVariable Integer commentId,
+                                           @AuthenticationPrincipal SecurityUser currentUser) {
+        if(commentService.deleteComment(adId, commentId, currentUser)) {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -138,8 +139,9 @@ public class CommentController {
     public ResponseEntity<Comment> updateComment(
             @PathVariable Integer adId,
             @PathVariable Integer commentId,
-            @RequestBody Comment comment) {
-        Comment updateComment = commentService.updateComment(adId, commentId, comment);
+            @RequestBody Comment comment,
+            @AuthenticationPrincipal SecurityUser currentUser) {
+        Comment updateComment = commentService.updateComment(adId, commentId, comment, currentUser);
         if(updateComment != null) {
             return ResponseEntity.ok(updateComment);
         } else {
