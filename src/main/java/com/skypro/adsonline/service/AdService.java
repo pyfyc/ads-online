@@ -9,13 +9,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface AdService {
 
-    Ads addAd(CreateAds properties, MultipartFile image, SecurityUser currentUser);
+    Ads addAd(CreateAds properties,
+              MultipartFile image,
+              SecurityUser currentUser);
 
     FullAds getAds(Integer id);
 
-    boolean removeAd(Integer id);
+    boolean removeAd(Integer id, SecurityUser currentUser);
 
-    Ads updateAds(Integer id, CreateAds ads);
+    Ads updateAds(Integer id, CreateAds ads, SecurityUser currentUser);
 
     ResponseWrapperAds getAdsMe(SecurityUser currentUser);
 
