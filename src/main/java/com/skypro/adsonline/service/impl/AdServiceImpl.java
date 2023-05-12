@@ -73,8 +73,7 @@ public class AdServiceImpl implements AdService {
 
     @Override
     public ResponseWrapperAds getAdsByTitleLike(String title) {
-        List<Ads> ads = adRepository.
-                findByTitleContainingIgnoreCase(title).stream()
+        List<Ads> ads = adRepository.findByTitleContainingIgnoreCase(title).stream()
                 .map(ad -> adMapper.mapToAdDto(ad))
                 .toList();
         return new ResponseWrapperAds(ads.size(), ads);
@@ -82,10 +81,9 @@ public class AdServiceImpl implements AdService {
 
     @Override
     public Ads updateAds(Integer id, CreateAds ads, SecurityUser currentUser) {
-
+        checkPermission(id, currentUser);
         AdEntity ad = adRepository.findById(id).orElseThrow(() ->
                 new AdNotFoundException(AD_NOT_FOUND_MSG.formatted(id)));
-        checkPermission(id, currentUser);
 
         ad.setTitle(ads.getTitle());
         ad.setDescription(ads.getDescription());
@@ -94,6 +92,7 @@ public class AdServiceImpl implements AdService {
         adRepository.save(ad);
         return adMapper.mapToAdDto(ad);
     }
+
     private void checkPermission(Integer adId, SecurityUser currentUser) {
         Integer authorId = adRepository
                 .findById(adId)

@@ -9,9 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface AdService {
 
-    Ads addAd(CreateAds properties,
-              MultipartFile image,
-              SecurityUser currentUser);
+    Ads addAd(CreateAds properties, MultipartFile image, SecurityUser currentUser);
 
     FullAds getAds(Integer id);
 
