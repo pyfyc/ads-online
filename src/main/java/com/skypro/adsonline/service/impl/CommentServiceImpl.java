@@ -67,15 +67,16 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Comment updateComment(Integer adId, Integer commentId, Comment comment, SecurityUser currentUser) {
+        checkPermission(commentId, currentUser);
         AdEntity ad = adRepository.findById(adId).
                 orElseThrow(() -> new AdNotFoundException(AD_NOT_FOUND_MSG.formatted(adId)));
-        checkPermission(commentId, currentUser);
         CommentEntity foundComment = commentRepository.findById(commentId).
                 orElseThrow(() -> new CommentNotFoundException(COMMENT_NOT_FOUND_MSG.formatted(commentId)));
         foundComment.setText(comment.getText());
         commentRepository.save(foundComment);
         return commentMapper.mapToCommentDto(foundComment);
     }
+
     /**
      * Checks if the author of the comment is the same as logged-in user.
      * If it is not and the user is not an ADMIN then throw an exception.
@@ -90,7 +91,7 @@ public class CommentServiceImpl implements CommentService {
                 .getId();
         if (!authorId.equals(currentUser.getUser().getId())
                 && !currentUser.getAuthorities().contains(new SimpleGrantedAuthority(Role.ADMIN.name()))) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, ACCESS_DENIED_MSG);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, ACCESS_DENIED_MSG.formatted(currentUser.getUsername()));
         }
     }
 }
