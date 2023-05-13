@@ -93,17 +93,21 @@ public class AdServiceImpl implements AdService {
         return adMapper.mapToAdDto(ad);
     }
 
+    /**
+     * Checks if the author of the ad is the same as logged-in user.
+     * If it is not and the user is not an ADMIN then throw an exception.
+     * @param adId ad id
+     * @param currentUser logged-in user
+     */
     private void checkPermission(Integer adId, SecurityUser currentUser) {
         Integer authorId = adRepository
                 .findById(adId)
-                .orElseThrow(() ->
-                        new AdNotFoundException(AD_NOT_FOUND_MSG.formatted(adId)))
+                .orElseThrow(() -> new AdNotFoundException(AD_NOT_FOUND_MSG.formatted(adId)))
                 .getAuthor()
                 .getId();
         if (!authorId.equals(currentUser.getUser().getId())
-                && !currentUser.getAuthorities().
-                contains(new SimpleGrantedAuthority(Role.ADMIN.name()))) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, ACCESS_DENIED_MSG);
+                && !currentUser.getAuthorities().contains(new SimpleGrantedAuthority(Role.ADMIN.name()))) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, ACCESS_DENIED_MSG.formatted(currentUser.getUsername()));
         }
     }
 }
