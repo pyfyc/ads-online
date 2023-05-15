@@ -2,37 +2,41 @@ package com.skypro.adsonline.service.impl;
 
 import com.skypro.adsonline.dto.*;
 import com.skypro.adsonline.exception.AdNotFoundException;
+import com.skypro.adsonline.exception.UserNotFoundException;
 import com.skypro.adsonline.model.AdEntity;
+import com.skypro.adsonline.model.UserEntity;
 import com.skypro.adsonline.repository.AdRepository;
-import com.skypro.adsonline.security.SecurityUser;
+import com.skypro.adsonline.repository.UserRepository;
 import com.skypro.adsonline.service.AdService;
 import com.skypro.adsonline.utils.AdMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
-import static com.skypro.adsonline.constant.ErrorMessage.ACCESS_DENIED_MSG;
-import static com.skypro.adsonline.constant.ErrorMessage.AD_NOT_FOUND_MSG;
+import static com.skypro.adsonline.constant.ErrorMessage.*;
 
 @Service
 public class AdServiceImpl implements AdService {
 
     private final AdRepository adRepository;
+    private final UserRepository userRepository;
     private final AdMapper adMapper;
 
-    public AdServiceImpl(AdRepository adRepository, AdMapper adMapper) {
+    public AdServiceImpl(AdRepository adRepository, UserRepository userRepository, AdMapper adMapper) {
         this.adRepository = adRepository;
+        this.userRepository = userRepository;
         this.adMapper = adMapper;
     }
 
     @Override
-    public Ads addAd(CreateAds properties, MultipartFile image, SecurityUser currentUser) {
+    public Ads addAd(CreateAds properties, MultipartFile image, UserDetails currentUser) {
         AdEntity ad = adMapper.mapToAdEntity(properties, image, currentUser.getUsername());
-        adRepository.save(ad);
+        ad = adRepository.save(ad);
         return adMapper.mapToAdDto(ad);
     }
 
@@ -43,7 +47,7 @@ public class AdServiceImpl implements AdService {
     }
 
     @Override
-    public boolean removeAd(Integer id, SecurityUser currentUser) {
+    public boolean removeAd(Integer id, UserDetails currentUser) {
         checkPermission(id, currentUser);
         AdEntity ad = adRepository.findById(id).orElseThrow(() -> new AdNotFoundException(AD_NOT_FOUND_MSG.formatted(id)));
         adRepository.delete(ad);
@@ -51,13 +55,18 @@ public class AdServiceImpl implements AdService {
     }
 
     @Override
-    public boolean updateImage(Integer id, MultipartFile image) {
-        return false;
+    public boolean updateImage(Integer id, MultipartFile image, UserDetails currentUser) {
+        checkPermission(id, currentUser);
+        return true;
     }
 
     @Override
-    public ResponseWrapperAds getAdsMe(SecurityUser currentUser) {
-        List<Ads> ads = adRepository.findByAuthor(currentUser.getUser()).stream()
+    public ResponseWrapperAds getAdsMe(UserDetails currentUser) {
+        UserEntity author = userRepository.findByUsername(currentUser.getUsername());
+        if (author == null) {
+            throw new UserNotFoundException(USER_NOT_FOUND_MSG.formatted(currentUser.getUsername()));
+        }
+        List<Ads> ads = adRepository.findByAuthor(author).stream()
                 .map(ad -> adMapper.mapToAdDto(ad))
                 .toList();
         return new ResponseWrapperAds(ads.size(), ads);
@@ -80,7 +89,7 @@ public class AdServiceImpl implements AdService {
     }
 
     @Override
-    public Ads updateAds(Integer id, CreateAds ads, SecurityUser currentUser) {
+    public Ads updateAds(Integer id, CreateAds ads, UserDetails currentUser) {
         checkPermission(id, currentUser);
         AdEntity ad = adRepository.findById(id).orElseThrow(() ->
                 new AdNotFoundException(AD_NOT_FOUND_MSG.formatted(id)));
@@ -99,13 +108,13 @@ public class AdServiceImpl implements AdService {
      * @param adId ad id
      * @param currentUser logged-in user
      */
-    private void checkPermission(Integer adId, SecurityUser currentUser) {
-        Integer authorId = adRepository
+    private void checkPermission(Integer adId, UserDetails currentUser) {
+        String authorUsername = adRepository
                 .findById(adId)
                 .orElseThrow(() -> new AdNotFoundException(AD_NOT_FOUND_MSG.formatted(adId)))
                 .getAuthor()
-                .getId();
-        if (!authorId.equals(currentUser.getUser().getId())
+                .getUsername();
+        if (!authorUsername.equals(currentUser.getUsername())
                 && !currentUser.getAuthorities().contains(new SimpleGrantedAuthority(Role.ADMIN.name()))) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, ACCESS_DENIED_MSG.formatted(currentUser.getUsername()));
         }
