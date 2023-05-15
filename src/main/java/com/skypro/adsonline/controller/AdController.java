@@ -4,7 +4,6 @@ import com.skypro.adsonline.dto.Ads;
 import com.skypro.adsonline.dto.CreateAds;
 import com.skypro.adsonline.dto.FullAds;
 import com.skypro.adsonline.dto.ResponseWrapperAds;
-import com.skypro.adsonline.security.SecurityUser;
 import com.skypro.adsonline.service.AdService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class AdController {
 
     private final AdService adService;
+    private final UserDetails userDetails;
 
     @Operation(
             summary = "Получить все объявления",
@@ -73,9 +73,8 @@ public class AdController {
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Ads> addAd(
                 @RequestPart CreateAds properties,
-                @RequestPart(name = "image") MultipartFile image,
-                @AuthenticationPrincipal SecurityUser currentUser) {
-        Ads ad = adService.addAd(properties, image, currentUser);
+                @RequestPart(name = "image") MultipartFile image) {
+        Ads ad = adService.addAd(properties, image, userDetails);
         if(ad != null) {
             return ResponseEntity.status(HttpStatus.CREATED).body(ad);
         } else {
@@ -130,9 +129,8 @@ public class AdController {
             tags = "Объявления"
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> removeAd(@PathVariable("id") Integer id,
-                                      @AuthenticationPrincipal SecurityUser currentUser) {
-        if(adService.removeAd(id, currentUser)) {
+    public ResponseEntity<?> removeAd(@PathVariable("id") Integer id) {
+        if(adService.removeAd(id, userDetails)) {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -163,9 +161,8 @@ public class AdController {
     )
     @PatchMapping("/{id}")
     public ResponseEntity<Ads> updateAds(@PathVariable("id") Integer id,
-                                         @RequestBody CreateAds ads,
-                                         @AuthenticationPrincipal SecurityUser currentUser) {
-        Ads ad = adService.updateAds(id, ads, currentUser);
+                                         @RequestBody CreateAds ads) {
+        Ads ad = adService.updateAds(id, ads, userDetails);
         if(ad != null) {
             return ResponseEntity.ok(ad);
         } else {
@@ -192,8 +189,8 @@ public class AdController {
             tags = "Объявления"
     )
     @GetMapping("/me")
-    public ResponseEntity<ResponseWrapperAds> getAdsMe(@AuthenticationPrincipal SecurityUser currentUser) {
-        ResponseWrapperAds ads = adService.getAdsMe(currentUser);
+    public ResponseEntity<ResponseWrapperAds> getAdsMe() {
+        ResponseWrapperAds ads = adService.getAdsMe(userDetails);
         if(ads != null) {
             return ResponseEntity.ok(ads);
         } else {
@@ -258,9 +255,8 @@ public class AdController {
     @PatchMapping(value = "/{id}/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> updateImage(
             @PathVariable("id") Integer id,
-            @RequestPart(name = "image") MultipartFile image,
-            @AuthenticationPrincipal SecurityUser currentUser) {
-        if(adService.updateImage(id, image)) {
+            @RequestPart(name = "image") MultipartFile image) {
+        if(adService.updateImage(id, image, userDetails)) {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

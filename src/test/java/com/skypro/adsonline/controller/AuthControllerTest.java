@@ -15,7 +15,6 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -47,7 +46,8 @@ class AuthControllerTest {
         user.setUsername("test@gmail.com");
         user.setPassword(encoder.encode("12345"));
 
-        UserDetails userDetails = new SecurityUser(user);
+        SecurityUser userDetails = new SecurityUser();
+        userDetails.setUser(user);
 
         when(userDetailsService.loadUserByUsername(any(String.class))).thenReturn(userDetails);
 
