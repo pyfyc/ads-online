@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Collection;
+
 
 @Entity
 @Getter
@@ -18,8 +20,13 @@ public class AdEntity {
     private String title;
     private String description;
     private int price;
+
     @ManyToOne
     @JoinColumn(name = "author_id", foreignKey = @ForeignKey(name = "fk_ads_users"))
     private UserEntity author;
+
+    @OneToMany(mappedBy = "ad", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Collection<CommentEntity> comments;
+
     private String image;
 }

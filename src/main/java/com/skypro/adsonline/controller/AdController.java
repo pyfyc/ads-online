@@ -32,7 +32,7 @@ public class AdController {
             summary = "Получить все объявления",
             responses = {
                     @ApiResponse(
-                            responseCode = "201",
+                            responseCode = "200",
                             description = "OK",
                             content = @Content(
                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -66,14 +66,6 @@ public class AdController {
                     @ApiResponse(
                             responseCode = "401",
                             description = "Unauthorized"
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description = "Forbidden"
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Not Found"
                     )
             },
             tags = "Объявления"
@@ -103,8 +95,8 @@ public class AdController {
                             )
                     ),
                     @ApiResponse(
-                            responseCode = "404",
-                            description = "Not Found"
+                            responseCode = "401",
+                            description = "Unauthorized"
                     )
             },
             tags = "Объявления"
@@ -138,8 +130,9 @@ public class AdController {
             tags = "Объявления"
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> removeAd(@PathVariable("id") Integer id) {
-        if(adService.removeAd(id)) {
+    public ResponseEntity<?> removeAd(@PathVariable("id") Integer id,
+                                      @AuthenticationPrincipal SecurityUser currentUser) {
+        if(adService.removeAd(id, currentUser)) {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -164,17 +157,15 @@ public class AdController {
                     @ApiResponse(
                             responseCode = "403",
                             description = "Forbidden"
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Not Found"
                     )
             },
             tags = "Объявления"
     )
     @PatchMapping("/{id}")
-    public ResponseEntity<Ads> updateAds(@PathVariable("id") Integer id, @RequestBody CreateAds ads) {
-        Ads ad = adService.updateAds(id, ads);
+    public ResponseEntity<Ads> updateAds(@PathVariable("id") Integer id,
+                                         @RequestBody CreateAds ads,
+                                         @AuthenticationPrincipal SecurityUser currentUser) {
+        Ads ad = adService.updateAds(id, ads, currentUser);
         if(ad != null) {
             return ResponseEntity.ok(ad);
         } else {
@@ -183,7 +174,7 @@ public class AdController {
     }
 
     @Operation(
-            summary = "Получение моих объявлений",
+            summary = "Получить объявления авторизованного пользователя",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -196,10 +187,6 @@ public class AdController {
                     @ApiResponse(
                             responseCode = "401",
                             description = "Unauthorized"
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description = "Forbidden"
                     )
             },
             tags = "Объявления"
@@ -258,8 +245,12 @@ public class AdController {
                             )
                     ),
                     @ApiResponse(
-                            responseCode = "404",
-                            description = "Not Found"
+                            responseCode = "401",
+                            description = "Unauthorized"
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Forbidden"
                     )
             },
             tags = "Объявления"
@@ -267,7 +258,8 @@ public class AdController {
     @PatchMapping(value = "/{id}/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> updateImage(
             @PathVariable("id") Integer id,
-            @RequestPart(name = "image") MultipartFile image) {
+            @RequestPart(name = "image") MultipartFile image,
+            @AuthenticationPrincipal SecurityUser currentUser) {
         if(adService.updateImage(id, image)) {
             return ResponseEntity.ok().build();
         } else {
