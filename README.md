@@ -18,7 +18,12 @@ https://github.com/BizinMitya/front-react-avito/blob/v1.11/openapi.yaml
 - команда для запуска на винде и ликуксе:  
 `docker run --rm --name front-react-avito-v1.11-instance -p3000:3000 ghcr.io/bizinmitya/front-react-avito:v1.11`
 
-### Над проектом работала команда Java Juice Team:
+# Технологии в проекте
+Язык и окружение - Java 17, Spring Boot 3.0.5, Hibernate, PostgreSQL, Lombok, Spring Doc Open Api   
+Тестирование - JUnit, Mockito   
+Прочее - Docker
+
+# Наша команда - Java Juice Team:
 - Москаленко Алексей
 - Цветов Денис
 - Ишмаев Тамерлан
