@@ -2,7 +2,6 @@ package com.skypro.adsonline.controller;
 
 import com.skypro.adsonline.dto.NewPassword;
 import com.skypro.adsonline.dto.User;
-import com.skypro.adsonline.security.SecurityUser;
 import com.skypro.adsonline.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("users")
 public class UserController {
     private final UserService userService;
+    private final UserDetails userDetails;
 
     @Operation(
             summary = "Обновление пароля",
@@ -44,9 +44,8 @@ public class UserController {
             tags = "Пользователи"
     )
     @PostMapping("/set_password")
-    public ResponseEntity<User> setPassword(@RequestBody NewPassword password,
-                                            @AuthenticationPrincipal SecurityUser currentUser) {
-        User user = userService.setPassword(password, currentUser);
+    public ResponseEntity<User> setPassword(@RequestBody NewPassword password) {
+        User user = userService.setPassword(password, userDetails);
         if (user != null) {
             return ResponseEntity.ok(user);
         } else {
@@ -73,8 +72,8 @@ public class UserController {
             tags = "Пользователи"
     )
     @GetMapping("/me")
-    public ResponseEntity<User> getUser(@AuthenticationPrincipal SecurityUser currentUser) {
-        User user = userService.getUser(currentUser);
+    public ResponseEntity<User> getUser() {
+        User user = userService.getUser(userDetails);
         if (user != null) {
             return ResponseEntity.ok(user);
         } else {
@@ -101,9 +100,8 @@ public class UserController {
             tags = "Пользователи"
     )
     @PatchMapping("/me")
-    public ResponseEntity<?> updateUser(@RequestBody User user,
-                                        @AuthenticationPrincipal SecurityUser currentUser) {
-        if (userService.updateUser(user, currentUser)) {
+    public ResponseEntity<?> updateUser(@RequestBody User user) {
+        if (userService.updateUser(user, userDetails)) {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -126,7 +124,7 @@ public class UserController {
     )
     @PatchMapping(value = "/me/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> updateUserImage(@RequestPart(name = "image") MultipartFile image) {
-        if (userService.updateUserImage(image)) {
+        if (userService.updateUserImage(image, userDetails)) {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
