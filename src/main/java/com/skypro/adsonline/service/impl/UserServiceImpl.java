@@ -6,9 +6,9 @@ import com.skypro.adsonline.exception.UserNotFoundException;
 import com.skypro.adsonline.exception.WrongPasswordException;
 import com.skypro.adsonline.model.UserEntity;
 import com.skypro.adsonline.repository.UserRepository;
-import com.skypro.adsonline.security.SecurityUser;
 import com.skypro.adsonline.service.UserService;
 import com.skypro.adsonline.utils.UserMapper;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUser(SecurityUser currentUser) {
+    public User getUser(UserDetails currentUser) {
         UserEntity user = userRepository.findByUsername(currentUser.getUsername());
         if (user != null) {
             return userMapper.mapToUserDto(user);
@@ -40,12 +40,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean updateUserImage(MultipartFile image) {
+    public boolean updateUserImage(MultipartFile image, UserDetails currentUser) {
         return false;
     }
 
     @Override
-    public User setPassword(NewPassword newPasswordDto, SecurityUser currentUser) {
+    public User setPassword(NewPassword newPasswordDto, UserDetails currentUser) {
         UserEntity user = checkUserByUsername(currentUser.getUsername());
         String encryptedPassword = user.getPassword();
         if (!passwordEncoder.matches(newPasswordDto.getCurrentPassword(), encryptedPassword)) {
@@ -53,12 +53,11 @@ public class UserServiceImpl implements UserService {
         }
 
         String newPassword = newPasswordDto.getNewPassword();
-
         String encodedPassword = passwordEncoder.encode(newPassword);
         user.setPassword(encodedPassword);
         userRepository.save(user);
-        return userMapper.mapToUserDto(user);
 
+        return userMapper.mapToUserDto(user);
     }
 
     @Override
@@ -71,7 +70,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean updateUser(User userDto, SecurityUser currentUser) {
+    public boolean updateUser(User userDto, UserDetails currentUser) {
         UserEntity user = checkUserByUsername(currentUser.getUsername());
 
         user.setFirstName(userDto.getFirstName());
