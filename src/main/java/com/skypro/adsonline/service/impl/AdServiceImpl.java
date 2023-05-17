@@ -9,6 +9,7 @@ import com.skypro.adsonline.repository.AdRepository;
 import com.skypro.adsonline.repository.UserRepository;
 import com.skypro.adsonline.service.AdService;
 import com.skypro.adsonline.utils.AdMapper;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +22,7 @@ import java.util.List;
 import static com.skypro.adsonline.constant.ErrorMessage.*;
 
 @Service
+@Transactional
 public class AdServiceImpl implements AdService {
 
     private final AdRepository adRepository;

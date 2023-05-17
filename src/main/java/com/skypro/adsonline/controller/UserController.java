@@ -16,6 +16,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
@@ -123,7 +125,7 @@ public class UserController {
             tags = "Пользователи"
     )
     @PatchMapping(value = "/me/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<?> updateUserImage(@RequestPart(name = "image") MultipartFile image) {
+    public ResponseEntity<?> updateUserImage(@RequestPart(name = "image") MultipartFile image) throws IOException {
         if (userService.updateUserImage(image, userDetails)) {
             return ResponseEntity.ok().build();
         } else {
