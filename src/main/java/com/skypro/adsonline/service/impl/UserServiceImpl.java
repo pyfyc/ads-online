@@ -8,20 +8,31 @@ import com.skypro.adsonline.model.UserEntity;
 import com.skypro.adsonline.repository.UserRepository;
 import com.skypro.adsonline.service.UserService;
 import com.skypro.adsonline.utils.UserMapper;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import static com.skypro.adsonline.constant.ErrorMessage.USER_NOT_FOUND_MSG;
 import static com.skypro.adsonline.constant.ErrorMessage.WRONG_PASS_MSG;
+import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+
+    @Value("${users.avatar.dir.path}")
+    private String avatarsDir;
 
     public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -40,8 +51,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean updateUserImage(MultipartFile image, UserDetails currentUser) {
-        return false;
+    public boolean updateUserImage(MultipartFile image, UserDetails currentUser) throws IOException {
+        UserEntity user = checkUserByUsername(currentUser.getUsername());
+
+        Path filePath = Path.of(avatarsDir, user.getId() + "." + getExtension(image.getOriginalFilename()));
+        Files.createDirectories(filePath.getParent());
+        Files.deleteIfExists(filePath);
+
+        try (InputStream is = image.getInputStream();
+             OutputStream os = Files.newOutputStream(filePath, CREATE_NEW);
+             BufferedInputStream bis = new BufferedInputStream(is, 1024);
+             BufferedOutputStream bos = new BufferedOutputStream(os, 1024);) {
+            bis.transferTo(bos);
+        }
+
+        user.setImageDb(image.getBytes());
+        user.setImage("/" + avatarsDir + "/" + user.getId());
+        userRepository.save(user);
+        return true;
     }
 
     @Override
@@ -78,5 +105,15 @@ public class UserServiceImpl implements UserService {
         user.setPhone(userDto.getPhone());
         userRepository.save(user);
         return true;
+    }
+
+    public byte[] getAvatarFromDb(Integer userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND_MSG.formatted(userId)));
+        return user.getImageDb();
+    }
+
+    private String getExtension(String fileName) {
+        return fileName.substring(fileName.lastIndexOf(".") + 1);
     }
 }

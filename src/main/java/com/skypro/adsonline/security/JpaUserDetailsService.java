@@ -4,6 +4,7 @@ import com.skypro.adsonline.exception.UserNotFoundException;
 import com.skypro.adsonline.model.UserEntity;
 import com.skypro.adsonline.repository.UserRepository;
 import com.skypro.adsonline.utils.UserMapper;
+import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +28,7 @@ public class JpaUserDetailsService implements UserDetailsService {
     }
 
     @Override
+    @Transactional
     public UserDetails loadUserByUsername(String username) {
         UserEntity userFromDb = userRepository.findByUsername(username);
         if (userFromDb == null) {
