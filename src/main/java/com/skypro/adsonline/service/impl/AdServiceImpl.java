@@ -2,12 +2,12 @@ package com.skypro.adsonline.service.impl;
 
 import com.skypro.adsonline.dto.*;
 import com.skypro.adsonline.exception.AdNotFoundException;
-import com.skypro.adsonline.exception.UserNotFoundException;
 import com.skypro.adsonline.model.AdEntity;
 import com.skypro.adsonline.model.UserEntity;
 import com.skypro.adsonline.repository.AdRepository;
 import com.skypro.adsonline.repository.UserRepository;
 import com.skypro.adsonline.service.AdService;
+import com.skypro.adsonline.service.UserService;
 import com.skypro.adsonline.utils.AdMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
@@ -19,7 +19,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
-import static com.skypro.adsonline.constant.ErrorMessage.*;
+import static com.skypro.adsonline.constant.ErrorMessage.ACCESS_DENIED_MSG;
+import static com.skypro.adsonline.constant.ErrorMessage.AD_NOT_FOUND_MSG;
 
 @Service
 @Transactional
@@ -27,12 +28,14 @@ public class AdServiceImpl implements AdService {
 
     private final AdRepository adRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
     private final AdMapper adMapper;
 
-    public AdServiceImpl(AdRepository adRepository, UserRepository userRepository, AdMapper adMapper) {
+    public AdServiceImpl(AdRepository adRepository, UserRepository userRepository, AdMapper adMapper, UserService userService) {
         this.adRepository = adRepository;
         this.userRepository = userRepository;
         this.adMapper = adMapper;
+        this.userService = userService;
     }
 
     @Override
@@ -64,10 +67,7 @@ public class AdServiceImpl implements AdService {
 
     @Override
     public ResponseWrapperAds getAdsMe(UserDetails currentUser) {
-        UserEntity author = userRepository.findByUsername(currentUser.getUsername());
-        if (author == null) {
-            throw new UserNotFoundException(USER_NOT_FOUND_MSG.formatted(currentUser.getUsername()));
-        }
+        UserEntity author = userService.checkUserByUsername(currentUser.getUsername());
         List<Ads> ads = adRepository.findByAuthor(author).stream()
                 .map(ad -> adMapper.mapToAdDto(ad))
                 .toList();
