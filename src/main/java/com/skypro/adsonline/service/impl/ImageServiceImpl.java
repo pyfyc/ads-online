@@ -54,7 +54,10 @@ public class ImageServiceImpl implements ImageService {
             bis.transferTo(bos);
         }
 
-        ImageEntity imageDetails = new ImageEntity();
+        ImageEntity imageDetails = imageRepository.findByUser(user);
+        if (imageDetails == null) {
+            imageDetails = new ImageEntity();
+        }
         imageDetails.setImageType(ImageType.AVATAR);
         imageDetails.setFilePath(filePath.toString());
         imageDetails.setFileExtension(getExtension(image.getOriginalFilename()));
