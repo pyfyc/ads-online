@@ -14,9 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
@@ -107,29 +104,6 @@ public class UserController {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-    }
-
-    @Operation(
-            summary = "Обновить аватар авторизованного пользователя",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Фото изменено"
-                    ),
-                    @ApiResponse(
-                            responseCode = "401",
-                            description = "Unauthorized"
-                    )
-            },
-            tags = "Пользователи"
-    )
-    @PatchMapping(value = "/me/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<?> updateUserImage(@RequestPart(name = "image") MultipartFile image) throws IOException {
-        if (userService.updateUserImage(image, userDetails)) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }
