@@ -72,19 +72,19 @@ public class ImageController {
 
     /**
      * Get user avatar from disk by user id.
-     * @param id user id
+     * @param userId user id
      * @param response user avatar picture sent to front-end
      * @throws IOException
      */
-    @GetMapping("/avatars/{id}")
-    public void getAvatarFromDisk(@PathVariable Integer id, HttpServletResponse response) throws IOException {
-        UserEntity user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND_MSG.formatted(id)));
+    @GetMapping("/avatars/{userId}")
+    public void getAvatarFromDisk(@PathVariable Integer userId, HttpServletResponse response) throws IOException {
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND_MSG.formatted(userId)));
         ImageEntity imageDetails = imageRepository.findByUser(user);
         if (imageDetails == null) {
             return;
         }
 
-        Path filePath = Path.of(avatarsDir, id + "." + imageDetails.getFileExtension());
+        Path filePath = Path.of(avatarsDir, userId + "." + imageDetails.getFileExtension());
 
         try (InputStream is = Files.newInputStream(filePath);
              OutputStream os = response.getOutputStream();) {

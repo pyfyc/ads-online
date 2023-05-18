@@ -2,7 +2,6 @@ package com.skypro.adsonline.controller;
 
 import com.skypro.adsonline.dto.Comment;
 import com.skypro.adsonline.dto.ResponseWrapperComment;
-import com.skypro.adsonline.security.SecurityUser;
 import com.skypro.adsonline.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -24,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
 
     private final CommentService commentService;
+    private final UserDetails userDetails;
 
     @Operation(
             summary = "Получить комментарии объявления",
@@ -74,9 +74,8 @@ public class CommentController {
     @PostMapping("/{id}/comments")
     public ResponseEntity<Comment> addComment(
                     @PathVariable Integer id,
-                    @RequestBody Comment comment,
-                    @AuthenticationPrincipal SecurityUser currentUser) {
-        Comment newComment = commentService.addComment(id, comment, currentUser);
+                    @RequestBody Comment comment) {
+        Comment newComment = commentService.addComment(id, comment, userDetails);
         if(newComment != null) {
             return ResponseEntity.ok(newComment);
         } else {
@@ -104,9 +103,8 @@ public class CommentController {
     )
     @DeleteMapping("/{adId}/comments/{commentId}")
     public ResponseEntity<?> deleteComment(@PathVariable Integer adId,
-                                           @PathVariable Integer commentId,
-                                           @AuthenticationPrincipal SecurityUser currentUser) {
-        if(commentService.deleteComment(adId, commentId, currentUser)) {
+                                           @PathVariable Integer commentId) {
+        if(commentService.deleteComment(adId, commentId, userDetails)) {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -139,9 +137,8 @@ public class CommentController {
     public ResponseEntity<Comment> updateComment(
             @PathVariable Integer adId,
             @PathVariable Integer commentId,
-            @RequestBody Comment comment,
-            @AuthenticationPrincipal SecurityUser currentUser) {
-        Comment updateComment = commentService.updateComment(adId, commentId, comment, currentUser);
+            @RequestBody Comment comment) {
+        Comment updateComment = commentService.updateComment(adId, commentId, comment, userDetails);
         if(updateComment != null) {
             return ResponseEntity.ok(updateComment);
         } else {

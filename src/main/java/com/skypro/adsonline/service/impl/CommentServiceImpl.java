@@ -7,13 +7,16 @@ import com.skypro.adsonline.exception.AdNotFoundException;
 import com.skypro.adsonline.exception.CommentNotFoundException;
 import com.skypro.adsonline.model.AdEntity;
 import com.skypro.adsonline.model.CommentEntity;
+import com.skypro.adsonline.model.UserEntity;
 import com.skypro.adsonline.repository.AdRepository;
 import com.skypro.adsonline.repository.CommentRepository;
-import com.skypro.adsonline.security.SecurityUser;
 import com.skypro.adsonline.service.CommentService;
+import com.skypro.adsonline.service.UserService;
 import com.skypro.adsonline.utils.CommentMapper;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -22,16 +25,19 @@ import java.util.List;
 import static com.skypro.adsonline.constant.ErrorMessage.*;
 
 @Service
+@Transactional
 public class CommentServiceImpl implements CommentService {
 
     private final AdRepository adRepository;
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
+    private final UserService userService;
 
-    public CommentServiceImpl(AdRepository adRepository, CommentRepository commentRepository, CommentMapper commentMapper) {
+    public CommentServiceImpl(AdRepository adRepository, CommentRepository commentRepository, CommentMapper commentMapper, UserService userService) {
         this.adRepository = adRepository;
         this.commentRepository = commentRepository;
         this.commentMapper = commentMapper;
+        this.userService = userService;
     }
 
     @Override
@@ -43,11 +49,12 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Comment addComment(Integer id, Comment commentDto, SecurityUser currentUser) {
+    public Comment addComment(Integer id, Comment commentDto, UserDetails currentUser) {
         AdEntity ad = adRepository.findById(id).orElseThrow(() -> new AdNotFoundException(AD_NOT_FOUND_MSG.formatted(id)));
+        UserEntity author = userService.checkUserByUsername(currentUser.getUsername());
 
         CommentEntity comment = new CommentEntity();
-        comment.setAuthor(currentUser.getUser());
+        comment.setAuthor(author);
         comment.setAd(ad);
         comment.setCreatedAt(System.currentTimeMillis());
         comment.setText(commentDto.getText());
@@ -58,7 +65,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public boolean deleteComment(Integer adId, Integer commentId, SecurityUser currentUser) {
+    public boolean deleteComment(Integer adId, Integer commentId, UserDetails currentUser) {
         checkPermission(commentId, currentUser);
         CommentEntity comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(COMMENT_NOT_FOUND_MSG.formatted(commentId)));
         commentRepository.delete(comment);
@@ -66,7 +73,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Comment updateComment(Integer adId, Integer commentId, Comment comment, SecurityUser currentUser) {
+    public Comment updateComment(Integer adId, Integer commentId, Comment comment, UserDetails currentUser) {
         checkPermission(commentId, currentUser);
         AdEntity ad = adRepository.findById(adId).
                 orElseThrow(() -> new AdNotFoundException(AD_NOT_FOUND_MSG.formatted(adId)));
@@ -83,13 +90,13 @@ public class CommentServiceImpl implements CommentService {
      * @param commentId comment id
      * @param currentUser logged-in user
      */
-    private void checkPermission(Integer commentId, SecurityUser currentUser) {
-        Integer authorId = commentRepository
+    private void checkPermission(Integer commentId, UserDetails currentUser) {
+        String authorUsername = commentRepository
                 .findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException(COMMENT_NOT_FOUND_MSG.formatted(commentId)))
                 .getAuthor()
-                .getId();
-        if (!authorId.equals(currentUser.getUser().getId())
+                .getUsername();
+        if (!authorUsername.equals(currentUser.getUsername())
                 && !currentUser.getAuthorities().contains(new SimpleGrantedAuthority(Role.ADMIN.name()))) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, ACCESS_DENIED_MSG.formatted(currentUser.getUsername()));
         }
