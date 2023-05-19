@@ -23,4 +23,7 @@ public class ImageEntity {
     @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_images_users"))
     private UserEntity user;
 
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @JoinColumn(name = "ad_id", foreignKey = @ForeignKey(name = "fk_images_ads"))
+    private AdEntity ad;
 }

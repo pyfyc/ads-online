@@ -6,12 +6,18 @@ import com.skypro.adsonline.exception.UserNotFoundException;
 import com.skypro.adsonline.exception.WrongPasswordException;
 import com.skypro.adsonline.model.UserEntity;
 import com.skypro.adsonline.repository.UserRepository;
+import com.skypro.adsonline.service.ImageService;
 import com.skypro.adsonline.service.UserService;
 import com.skypro.adsonline.utils.UserMapper;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Path;
 
 import static com.skypro.adsonline.constant.ErrorMessage.USER_NOT_FOUND_MSG;
 import static com.skypro.adsonline.constant.ErrorMessage.WRONG_PASS_MSG;
@@ -23,11 +29,16 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final ImageService imageService;
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
+    @Value("${users.avatar.dir.path}")
+    private String avatarsDir;
+
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder, ImageService imageService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+        this.imageService = imageService;
     }
 
     @Override
@@ -75,4 +86,19 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         return true;
     }
+
+    @Override
+    public User updateUserImage(MultipartFile image, UserDetails currentUser) throws IOException {
+        UserEntity user = checkUserByUsername(currentUser.getUsername());
+
+        Path filePath = Path.of(avatarsDir, user.getId() + "." + imageService.getExtension(image.getOriginalFilename()));
+        imageService.saveFileOnDisk(image, filePath);
+        imageService.updateUserImageDetails(user, image, filePath);
+
+        user.setImage("/" + avatarsDir + "/" + user.getId());
+        userRepository.save(user);
+
+        return userMapper.mapToUserDto(user);
+    }
+
 }

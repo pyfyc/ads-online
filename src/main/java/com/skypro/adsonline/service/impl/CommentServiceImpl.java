@@ -41,7 +41,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public ResponseWrapperComment getComments(Integer id) {
+    public ResponseWrapperComment getComments(Integer id, UserDetails currentUser) {
         List<Comment> comments = commentRepository.findByAdId(id).stream()
                 .map(comment -> commentMapper.mapToCommentDto(comment))
                 .toList();

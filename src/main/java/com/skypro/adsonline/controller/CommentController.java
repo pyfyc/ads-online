@@ -45,7 +45,7 @@ public class CommentController {
     )
     @GetMapping("{id}/comments")
     public ResponseEntity<ResponseWrapperComment> getComments(@PathVariable Integer id) {
-        ResponseWrapperComment comments = commentService.getComments(id);
+        ResponseWrapperComment comments = commentService.getComments(id, userDetails);
         if(comments != null) {
             return ResponseEntity.ok(comments);
         } else {

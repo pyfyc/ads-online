@@ -19,7 +19,7 @@ public class WebSecurityConfig {
             "/v3/api-docs",
             "/webjars/**",
             "/login", "/register", "/ads",
-            "/avatars"
+            "/avatars/*", "/ads-image/*"
     };
 
     @Bean
@@ -27,7 +27,7 @@ public class WebSecurityConfig {
         http.csrf().disable()
                 .authorizeHttpRequests((authorization) -> authorization
                         .requestMatchers(AUTH_WHITELIST).permitAll()
-                        .requestMatchers("/ads/**", "/users/**", "/avatars/**").authenticated()
+                        .requestMatchers("/ads/**", "/users/**").authenticated()
                 )
                 .cors()
                 .and()
