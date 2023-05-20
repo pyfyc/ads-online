@@ -18,6 +18,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
@@ -73,7 +75,7 @@ public class AdController {
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Ads> addAd(
                 @RequestPart CreateAds properties,
-                @RequestPart(name = "image") MultipartFile image) {
+                @RequestPart(name = "image") MultipartFile image) throws IOException {
         Ads ad = adService.addAd(properties, image, userDetails);
         if(ad != null) {
             return ResponseEntity.status(HttpStatus.CREATED).body(ad);
@@ -102,7 +104,7 @@ public class AdController {
     )
     @GetMapping("/{id}")
     public ResponseEntity<FullAds> getAds(@PathVariable("id") Integer id) {
-        FullAds fullAd = adService.getAds(id);
+        FullAds fullAd = adService.getAds(id, userDetails);
         if(fullAd != null) {
             return ResponseEntity.ok(fullAd);
         } else {
@@ -199,6 +201,39 @@ public class AdController {
     }
 
     @Operation(
+            summary = "Обновить картинку объявления",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "OK",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE,
+                                    schema = @Schema(implementation = String[].class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized"
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Forbidden"
+                    )
+            },
+            tags = "Объявления"
+    )
+    @PatchMapping(value = "/{id}/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<?> updateImage(
+            @PathVariable("id") Integer id,
+            @RequestPart(name = "image") MultipartFile image) throws IOException {
+        if(adService.updateImage(id, image, userDetails)) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @Operation(
             summary = "Поиск объявлений по названию",
             responses = {
                     @ApiResponse(
@@ -227,39 +262,6 @@ public class AdController {
             return ResponseEntity.ok(ads);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-    }
-
-    @Operation(
-            summary = "Обновить картинку объявления",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "OK",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE,
-                                    schema = @Schema(implementation = String[].class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "401",
-                            description = "Unauthorized"
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description = "Forbidden"
-                    )
-            },
-            tags = "Объявления"
-    )
-    @PatchMapping(value = "/{id}/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<?> updateImage(
-            @PathVariable("id") Integer id,
-            @RequestPart(name = "image") MultipartFile image) {
-        if(adService.updateImage(id, image, userDetails)) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }

@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public interface CommentService {
 
-    ResponseWrapperComment getComments(Integer id);
+    ResponseWrapperComment getComments(Integer id, UserDetails currentUser);
 
     Comment addComment(Integer id, Comment comment, UserDetails currentUser);
 

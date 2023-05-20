@@ -1,73 +1,50 @@
 package com.skypro.adsonline.controller;
 
-import com.skypro.adsonline.dto.User;
+import com.skypro.adsonline.exception.AdNotFoundException;
 import com.skypro.adsonline.exception.UserNotFoundException;
+import com.skypro.adsonline.model.AdEntity;
 import com.skypro.adsonline.model.ImageEntity;
 import com.skypro.adsonline.model.UserEntity;
+import com.skypro.adsonline.repository.AdRepository;
 import com.skypro.adsonline.repository.ImageRepository;
 import com.skypro.adsonline.repository.UserRepository;
 import com.skypro.adsonline.service.ImageService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static com.skypro.adsonline.constant.ErrorMessage.AD_NOT_FOUND_MSG;
 import static com.skypro.adsonline.constant.ErrorMessage.USER_NOT_FOUND_MSG;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
+@Transactional
 public class ImageController {
     private final ImageService imageService;
-    private final UserDetails userDetails;
     private final ImageRepository imageRepository;
     private final UserRepository userRepository;
+    private final AdRepository adRepository;
 
     @Value("${users.avatar.dir.path}")
     private String avatarsDir;
 
-    public ImageController(ImageService imageService, UserDetails userDetails, UserRepository userRepository, ImageRepository imageRepository, UserRepository userRepository1) {
-        this.imageService = imageService;
-        this.userDetails = userDetails;
-        this.imageRepository = imageRepository;
-        this.userRepository = userRepository1;
-    }
+    @Value("${ads.image.dir.path}")
+    private String adsImageDir;
 
-    @Operation(
-            summary = "Обновить аватар авторизованного пользователя",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Фото изменено"
-                    ),
-                    @ApiResponse(
-                            responseCode = "401",
-                            description = "Unauthorized"
-                    )
-            },
-            tags = "Пользователи"
-    )
-    @PatchMapping(value = "/users/me/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<User> updateUserImage(@RequestPart(name = "image") MultipartFile image) throws IOException {
-        User user = imageService.updateUserImage(image, userDetails);
-        if (user != null) {
-            return ResponseEntity.ok(user);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    public ImageController(ImageService imageService, ImageRepository imageRepository, UserRepository userRepository, AdRepository adRepository) {
+        this.imageService = imageService;
+        this.imageRepository = imageRepository;
+        this.userRepository = userRepository;
+        this.adRepository = adRepository;
     }
 
     /**
@@ -79,19 +56,30 @@ public class ImageController {
     @GetMapping("/avatars/{userId}")
     public void getAvatarFromDisk(@PathVariable Integer userId, HttpServletResponse response) throws IOException {
         UserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND_MSG.formatted(userId)));
-        ImageEntity imageDetails = imageRepository.findByUser(user);
-        if (imageDetails == null) {
+        if (imageRepository.findByUser(user).isEmpty()) {
             return;
         }
 
+        ImageEntity imageDetails = imageRepository.findByUser(user).get();
         Path filePath = Path.of(avatarsDir, userId + "." + imageDetails.getFileExtension());
+        imageService.getImageFromDisk(response, filePath, imageDetails);
+    }
 
-        try (InputStream is = Files.newInputStream(filePath);
-             OutputStream os = response.getOutputStream();) {
-            response.setStatus(200);
-            response.setContentType(imageDetails.getMediaType());
-            response.setContentLength((int) imageDetails.getFileSize());
-            is.transferTo(os);
+    /**
+     * Get ad image from disk by its id.
+     * @param adId ad id
+     * @param response ad image picture sent to front-end
+     * @throws IOException
+     */
+    @GetMapping("/ads-image/{adId}")
+    public void getAdImageFromDisk(@PathVariable Integer adId, HttpServletResponse response) throws IOException {
+        AdEntity ad = adRepository.findById(adId).orElseThrow(() -> new AdNotFoundException(AD_NOT_FOUND_MSG.formatted(adId)));
+        if (imageRepository.findByAd(ad).isEmpty()) {
+            return;
         }
+
+        ImageEntity imageDetails = imageRepository.findByAd(ad).get();
+        Path filePath = Path.of(adsImageDir, ad.getAuthor().getId() + "-" + ad.getId() + "." + imageDetails.getFileExtension());
+        imageService.getImageFromDisk(response, filePath, imageDetails);
     }
 }
