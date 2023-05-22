@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -74,9 +75,10 @@ public class AdServiceImpl implements AdService {
     }
 
     @Override
-    public boolean removeAd(Integer id, UserDetails currentUser) {
+    public boolean removeAd(Integer id, UserDetails currentUser) throws IOException {
         checkPermission(id, currentUser);
         AdEntity ad = adRepository.findById(id).orElseThrow(() -> new AdNotFoundException(AD_NOT_FOUND_MSG.formatted(id)));
+        Files.deleteIfExists(Path.of(ad.getImageEntity().getFilePath()));
         adRepository.delete(ad);
         return true;
     }
