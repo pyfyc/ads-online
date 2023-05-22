@@ -131,7 +131,7 @@ public class AdController {
             tags = "Объявления"
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> removeAd(@PathVariable("id") Integer id) {
+    public ResponseEntity<?> removeAd(@PathVariable("id") Integer id) throws IOException {
         if(adService.removeAd(id, userDetails)) {
             return ResponseEntity.ok().build();
         } else {

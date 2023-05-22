@@ -12,7 +12,7 @@ import java.io.IOException;
 public interface AdService {
     Ads addAd(CreateAds properties, MultipartFile image, UserDetails currentUser) throws IOException;
     FullAds getAds(Integer id, UserDetails currentUser);
-    boolean removeAd(Integer id, UserDetails currentUser);
+    boolean removeAd(Integer id, UserDetails currentUser) throws IOException;
     Ads updateAds(Integer id, CreateAds ads, UserDetails currentUser);
     ResponseWrapperAds getAdsMe(UserDetails currentUser);
     ResponseWrapperAds getAllAds();
