@@ -8,7 +8,6 @@ import com.skypro.adsonline.model.AdEntity;
 import com.skypro.adsonline.model.UserEntity;
 import com.skypro.adsonline.repository.UserRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import static com.skypro.adsonline.constant.ErrorMessage.USER_NOT_FOUND_MSG;
 
@@ -20,11 +19,12 @@ public class AdMapper {
     }
 
     /**
-     * Dto -> entity mapping
+     * Dto -> entity mapping without image.
+     *   Image will be saved separately because it needs a created ad with id.
      * @param dto CreateAds dto class
      * @return AdEntity entity class
      */
-    public AdEntity mapToAdEntity(CreateAds dto, MultipartFile image, String username) {
+    public AdEntity mapToAdEntity(CreateAds dto, String username) {
 
         UserEntity author = userRepository.findByUsername(username);
         if (author == null) {
@@ -35,8 +35,6 @@ public class AdMapper {
         entity.setTitle(dto.getTitle());
         entity.setDescription(dto.getDescription());
         entity.setPrice(dto.getPrice());
-        //todo: BizinMitya: про valueOf потом не забудьте переделать)
-        entity.setImage(String.valueOf(image));
         entity.setAuthor(author);
         return entity;
     }

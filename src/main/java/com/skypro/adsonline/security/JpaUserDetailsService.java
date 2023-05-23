@@ -1,6 +1,5 @@
 package com.skypro.adsonline.security;
 
-import com.skypro.adsonline.dto.RegisterReq;
 import com.skypro.adsonline.exception.UserNotFoundException;
 import com.skypro.adsonline.model.UserEntity;
 import com.skypro.adsonline.repository.UserRepository;
@@ -18,25 +17,23 @@ public class JpaUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder encoder;
+    private final SecurityUser securityUser;
 
-    public JpaUserDetailsService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder encoder) {
+    public JpaUserDetailsService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder encoder, SecurityUser securityUser) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.encoder = encoder;
+        this.securityUser = securityUser;
     }
 
     @Override
+    //@Transactional
     public UserDetails loadUserByUsername(String username) {
         UserEntity userFromDb = userRepository.findByUsername(username);
         if (userFromDb == null) {
             throw new UserNotFoundException(USER_NOT_FOUND_MSG.formatted(username));
         }
-        return new SecurityUser(userFromDb);
-    }
-
-    public UserEntity saveUser(RegisterReq registerReq) {
-        UserEntity user = userMapper.mapToUserEntity(registerReq);
-        user.setPassword(encoder.encode(registerReq.getPassword()));
-        return userRepository.save(user);
+        securityUser.setUser(userFromDb);
+        return securityUser;
     }
 }

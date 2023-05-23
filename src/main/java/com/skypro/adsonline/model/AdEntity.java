@@ -1,12 +1,10 @@
 package com.skypro.adsonline.model;
 
-
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Collection;
-
 
 @Entity
 @Getter
@@ -27,6 +25,9 @@ public class AdEntity {
 
     @OneToMany(mappedBy = "ad", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Collection<CommentEntity> comments;
+
+    @OneToOne(mappedBy = "ad", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private AdImageEntity imageEntity;
 
     private String image;
 }
