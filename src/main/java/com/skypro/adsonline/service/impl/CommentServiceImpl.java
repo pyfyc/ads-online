@@ -59,7 +59,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setCreatedAt(System.currentTimeMillis());
         comment.setText(commentDto.getText());
 
-        commentRepository.save(comment);
+        comment = commentRepository.save(comment);
 
         return commentMapper.mapToCommentDto(comment);
     }
