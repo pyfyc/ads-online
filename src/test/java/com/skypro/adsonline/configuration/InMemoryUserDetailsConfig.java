@@ -3,6 +3,8 @@ package com.skypro.adsonline.configuration;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,9 +14,11 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import static com.skypro.adsonline.constant.SecurityConstantsTest.*;
 
 @TestConfiguration
+@EnableWebSecurity
 public class InMemoryUserDetailsConfig {
 
     @Bean
+    @Primary
     public UserDetailsService userDetailsService(@Qualifier(value = "userDetails") UserDetails user) {
         return new InMemoryUserDetailsManager(user);
     }
