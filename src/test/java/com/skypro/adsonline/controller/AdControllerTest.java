@@ -3,6 +3,7 @@ package com.skypro.adsonline.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.skypro.adsonline.configuration.InMemoryUserDetailsConfig;
 import com.skypro.adsonline.dto.ResponseWrapperAds;
+import com.skypro.adsonline.exception.AdNotFoundException;
 import com.skypro.adsonline.exception.UserNotFoundException;
 import com.skypro.adsonline.model.AdEntity;
 import com.skypro.adsonline.model.AdImageEntity;
@@ -69,7 +70,7 @@ class AdControllerTest {
     AdRepository adRepository;
 
     @MockBean
-    AdImageRepository imageRepository;
+    AdImageRepository adImageRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -99,7 +100,7 @@ class AdControllerTest {
 
         when(userRepository.findByUsername(any(String.class))).thenReturn(USER);
         when(adRepository.save(any(AdEntity.class))).thenReturn(AD);
-        when(imageRepository.save(any(AdImageEntity.class))).thenReturn(AD_IMAGE);
+        when(adImageRepository.save(any(AdImageEntity.class))).thenReturn(AD_IMAGE);
 
         mockMvc.perform(multipart("http://localhost:" + port + "/ads")
                         .part(adsPart)
@@ -122,10 +123,6 @@ class AdControllerTest {
         byte[] adsContent = objectMapper.writeValueAsString(CREATE_ADS_DTO).getBytes(UTF_8);
         MockPart adsPart = new MockPart("properties", "createAdsDto", adsContent);
         adsPart.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-
-        when(userRepository.findByUsername(any(String.class))).thenReturn(null);
-        when(adRepository.save(any(AdEntity.class))).thenReturn(AD);
-        when(imageRepository.save(any(AdImageEntity.class))).thenReturn(AD_IMAGE);
 
         mockMvc.perform(multipart("http://localhost:" + port + "/ads")
                         .part(adsPart)
@@ -152,6 +149,16 @@ class AdControllerTest {
                 .andExpect(jsonPath("$.phone").value(FULL_ADS_DTO.getPhone()))
                 .andExpect(jsonPath("$.price").value(FULL_ADS_DTO.getPrice()))
                 .andExpect(jsonPath("$.title").value(FULL_ADS_DTO.getTitle()));
+    }
+
+    @Test
+    @WithUserDetails(SECURITY_USER_NAME)
+    public void returnAdNotFoundWhenGetAd() throws Exception {
+        Integer id = 1;
+
+        mockMvc.perform(get("http://localhost:" + port + "/ads/{id}", id))
+                .andExpect(status().isNotFound())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof AdNotFoundException));
     }
 
     @Test
@@ -230,7 +237,7 @@ class AdControllerTest {
         final MockMultipartFile file = new MockMultipartFile("image", "image.jpeg", "image/jpeg", new byte[] { 0x00 });
 
         when(adRepository.findById(any(Integer.class))).thenReturn(Optional.of(AD));
-        when(imageRepository.save(any(AdImageEntity.class))).thenReturn(AD_IMAGE);
+        when(adImageRepository.save(any(AdImageEntity.class))).thenReturn(AD_IMAGE);
 
         MockMultipartHttpServletRequestBuilder builder = MockMvcRequestBuilders.multipart("http://localhost:" + port + "/ads/{id}/image", id);
         builder.with(request -> { request.setMethod("PATCH"); return request; });

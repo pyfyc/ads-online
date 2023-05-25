@@ -2,6 +2,7 @@ package com.skypro.adsonline.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.skypro.adsonline.configuration.InMemoryUserDetailsConfig;
+import com.skypro.adsonline.exception.CommentNotFoundException;
 import com.skypro.adsonline.model.CommentEntity;
 import com.skypro.adsonline.repository.AdRepository;
 import com.skypro.adsonline.repository.CommentRepository;
@@ -23,6 +24,7 @@ import java.util.Optional;
 import static com.skypro.adsonline.constant.DtoConstantsTest.ADS_COMMENT_DTO;
 import static com.skypro.adsonline.constant.EntityConstantsTest.*;
 import static com.skypro.adsonline.constant.SecurityConstantsTest.SECURITY_USER_NAME;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -104,7 +106,18 @@ class CommentControllerTest {
 
     @Test
     @WithUserDetails(SECURITY_USER_NAME)
-    public void updateComment() throws Exception {
+    public void returnCommentNotFoundWhenDeleteComment() throws Exception {
+        Integer adId = 1;
+        Integer commentId = 1;
+
+        mockMvc.perform(delete("http://localhost:" + port + "/ads/{adId}/comments/{commentId}", adId, commentId))
+                .andExpect(status().isNotFound())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof CommentNotFoundException));
+    }
+
+    @Test
+    @WithUserDetails(SECURITY_USER_NAME)
+    public void returnOkWhenUpdateComment() throws Exception {
         Integer adId = 1;
         Integer commentId = 1;
 
