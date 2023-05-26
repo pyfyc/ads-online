@@ -42,7 +42,7 @@ import static com.skypro.adsonline.constant.SecurityConstantsTest.SECURITY_USER_
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -178,6 +178,8 @@ class AdControllerTest {
 
         mockMvc.perform(delete("http://localhost:" + port + "/ads/{id}", id))
                 .andExpect(status().isOk());
+
+        verify(adRepository, times(1)).delete(AD);
     }
 
     @Test
