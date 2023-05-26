@@ -26,7 +26,7 @@ import static com.skypro.adsonline.constant.EntityConstantsTest.*;
 import static com.skypro.adsonline.constant.SecurityConstantsTest.SECURITY_USER_NAME;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -102,6 +102,8 @@ class CommentControllerTest {
 
         mockMvc.perform(delete("http://localhost:" + port + "/ads/{adId}/comments/{commentId}", adId, commentId))
                 .andExpect(status().isOk());
+
+        verify(commentRepository, times(1)).delete(AD_COMMENT);
     }
 
     @Test

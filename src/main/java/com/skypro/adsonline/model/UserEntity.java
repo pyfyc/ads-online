@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Collection;
+
 @Entity
 @Getter
 @Setter
@@ -20,4 +22,10 @@ public class UserEntity {
     private String phone;
     private Role role;
     private String image;
+
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Collection<AdEntity> ads;
+
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private AvatarEntity avatarEntity;
 }
