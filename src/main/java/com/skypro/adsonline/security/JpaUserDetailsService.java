@@ -27,7 +27,6 @@ public class JpaUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    //@Transactional
     public UserDetails loadUserByUsername(String username) {
         UserEntity userFromDb = userRepository.findByUsername(username);
         if (userFromDb == null) {
