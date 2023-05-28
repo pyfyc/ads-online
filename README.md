@@ -27,4 +27,4 @@ https://github.com/BizinMitya/front-react-avito/blob/v1.11/openapi.yaml
 - Москаленко Алексей
 - Цветов Денис
 - Ишмаев Тамерлан
-- Криобокова Ольга
+- Кривобокова Ольга
