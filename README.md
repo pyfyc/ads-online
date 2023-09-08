@@ -4,7 +4,7 @@
 
 - User authorization and authentification.
 - User roles separation: User / Admin.
-- CRUD for the ads on website: Admin can edit / delete all adds while User only his own.
+- CRUD for the ads on website: Admin can edit / delete all adds while User - only his own.
 - All users can leave comments for the ads. 
 - Search ads by title is available.
 - There is option to add pictures for the ads. 
