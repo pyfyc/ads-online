@@ -1,30 +1,30 @@
-### Наша команда Java Juice Team разработала бэкенд-часть сайта по перепродаже вещей - Ads Online.
+### Our team (Java Juice Team) developed backend part for the marketplace website - Ads Online.
 
-# Основной функционал:
+# Main functionalities:
 
-- Авторизация и аутентификация пользователей.
-- Распределение ролей между пользователями: пользователь и администратор.
-- CRUD для объявлений на сайте: администратор может удалять или редактировать все объявления, а пользователи — только свои.
-- Под каждым объявлением пользователи могут оставлять отзывы. 
-- В заголовке сайта можно осуществлять поиск объявлений по названию.
-- Показывать и сохранять картинки объявлений. 
+- User authorization and authentification.
+- User roles separation: User / Admin.
+- CRUD for the ads on website: Admin can edit / delete all adds while User only his own.
+- All users can leave comments for the ads. 
+- Search ads by title is available.
+- There is option to add pictures for the ads. 
 
-# Спецификация
+# Specification:
 
 https://github.com/BizinMitya/front-react-avito/blob/v1.11/openapi.yaml
 
-# Установка и запуск образа фронтэнд-части в Docker
+# Frontend image installation and run in Docker
 
-- команда для запуска на винде и ликуксе:  
+- command to run the image for Windows / Linux:  
 `docker run --rm --name front-react-avito-v1.11-instance -p3000:3000 ghcr.io/bizinmitya/front-react-avito:v1.11`
 
-# Технологии в проекте
-Язык и окружение - Java 17, Spring Boot 3.0.5, Hibernate, PostgreSQL, Lombok, Spring Doc Open Api   
-Тестирование - JUnit, Mockito   
-Прочее - Docker
+# Stack of technologies:
+Java 17, Spring Boot 3.0.5, Hibernate, PostgreSQL, Lombok, Spring Doc Open Api   
+JUnit, Mockito   
+Docker  
 
-# Наша команда - Java Juice Team:
-- Москаленко Алексей
-- Цветов Денис
-- Ишмаев Тамерлан
-- Кривобокова Ольга
+# Java Juice Team:
+- Moskalenko Alexey
+- Tsvetov Denis
+- Ishmaev Tamerlan
+- Krivobokova Olga
